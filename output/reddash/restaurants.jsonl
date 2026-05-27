@@ -1,0 +1,8 @@
+{"restaurant_id": "REST_001", "name": "Sakura Sushi", "cuisine_type": "Japanese", "city": "San Francisco", "address": "1234 Geary Blvd, SF, CA 94115", "rating": 4.7, "avg_prep_time_mins": 22, "status": "open"}
+{"restaurant_id": "REST_002", "name": "Bella Napoli", "cuisine_type": "Italian", "city": "San Francisco", "address": "567 Columbus Ave, SF, CA 94133", "rating": 4.5, "avg_prep_time_mins": 28, "status": "open"}
+{"restaurant_id": "REST_003", "name": "Taco Loco", "cuisine_type": "Mexican", "city": "Austin", "address": "801 S Congress Ave, Austin, TX 78704", "rating": 4.3, "avg_prep_time_mins": 15, "status": "open"}
+{"restaurant_id": "REST_004", "name": "Golden Dragon", "cuisine_type": "Chinese", "city": "New York", "address": "42 Mott St, NY, NY 10013", "rating": 4.4, "avg_prep_time_mins": 20, "status": "open"}
+{"restaurant_id": "REST_005", "name": "Burger Barn", "cuisine_type": "American", "city": "San Francisco", "address": "3200 24th St, SF, CA 94110", "rating": 4.1, "avg_prep_time_mins": 12, "status": "open"}
+{"restaurant_id": "REST_006", "name": "Spice Route", "cuisine_type": "Indian", "city": "New York", "address": "101 Lexington Ave, NY, NY 10016", "rating": 4.6, "avg_prep_time_mins": 30, "status": "open"}
+{"restaurant_id": "REST_007", "name": "Le Petit Bistro", "cuisine_type": "French", "city": "San Francisco", "address": "2100 Union St, SF, CA 94123", "rating": 4.8, "avg_prep_time_mins": 35, "status": "temporarily_closed"}
+{"restaurant_id": "REST_008", "name": "Seoul Kitchen", "cuisine_type": "Korean", "city": "Austin", "address": "4500 Guadalupe St, Austin, TX 78751", "rating": 4.2, "avg_prep_time_mins": 18, "status": "open"}

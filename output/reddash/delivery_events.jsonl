@@ -1,0 +1,11 @@
+{"event_id": "EVT_001", "order_id": "ORD_001", "event_type": "placed", "timestamp": "2026-05-21T21:13:51.890142+00:00", "description": "Order placed by Alex Rivera", "actor": "customer"}
+{"event_id": "EVT_002", "order_id": "ORD_001", "event_type": "confirmed", "timestamp": "2026-05-21T21:15:51.890142+00:00", "description": "Restaurant confirmed order", "actor": "restaurant"}
+{"event_id": "EVT_003", "order_id": "ORD_001", "event_type": "preparing", "timestamp": "2026-05-21T21:16:51.890142+00:00", "description": "Restaurant started preparing food", "actor": "restaurant"}
+{"event_id": "EVT_004", "order_id": "ORD_001", "event_type": "ready", "timestamp": "2026-05-21T21:35:51.890142+00:00", "description": "Food ready for pickup", "actor": "restaurant"}
+{"event_id": "EVT_005", "order_id": "ORD_001", "event_type": "driver_assigned", "timestamp": "2026-05-21T21:51:51.890142+00:00", "description": "Driver assigned: Marcus Johnson (bike)", "actor": "system"}
+{"event_id": "EVT_006", "order_id": "ORD_001", "event_type": "picked_up", "timestamp": "2026-05-21T21:58:51.890142+00:00", "description": "Driver picked up order from Sakura Sushi", "actor": "driver"}
+{"event_id": "EVT_007", "order_id": "ORD_001", "event_type": "en_route", "timestamp": "2026-05-21T21:59:51.890142+00:00", "description": "Driver en route to delivery address", "actor": "driver"}
+{"event_id": "EVT_008", "order_id": "ORD_002", "event_type": "placed", "timestamp": "2026-05-19T22:23:51.890142+00:00", "description": "Order placed", "actor": "customer"}
+{"event_id": "EVT_009", "order_id": "ORD_002", "event_type": "delivered", "timestamp": "2026-05-19T22:55:51.890142+00:00", "description": "Order delivered", "actor": "driver"}
+{"event_id": "EVT_010", "order_id": "ORD_007", "event_type": "placed", "timestamp": "2026-05-20T22:23:51.890142+00:00", "description": "Order placed", "actor": "customer"}
+{"event_id": "EVT_011", "order_id": "ORD_007", "event_type": "cancelled", "timestamp": "2026-05-20T22:28:51.890142+00:00", "description": "Cancelled by customer before restaurant started preparation", "actor": "customer"}

@@ -1,0 +1,49 @@
+# Redis Iris Workshop
+
+## What This Is
+
+A hands-on developer workshop where learners build a food delivery support agent ("Redis Eats") step-by-step using Redis Iris components. Learners edit 5 exercise files in `exercises/` — everything else is pre-built.
+
+## Running
+
+```bash
+make install    # uv sync + npm install
+make seed-data  # load policies into Redis
+make dev        # backend :8040, frontend :3040
+```
+
+Set `USE_SOLUTIONS=1` to run with all exercises pre-filled.
+
+## Architecture
+
+- **Exercises** (`exercises/`): The 5 files learners implement. Each subclasses a base from `backend/app/bases/` and overrides 2-3 hook methods.
+- **Base Classes** (`backend/app/bases/`): Pre-built boilerplate — HTTP clients, error handling, SSE streaming. Exercise files inherit from these.
+- **Service Re-exports** (`backend/app/services/`): One-line files that re-export from `exercises/`. Supports `USE_SOLUTIONS` env var to switch to reference implementations.
+- **Solutions** (`exercises/solutions/`): Complete exercise implementations.
+- **Backend** (`backend/app/`): FastAPI + SSE streaming (`main.py`), LangGraph ReAct agent (`langgraph_agent.py`).
+- **Frontend** (`frontend/`): React + Vite. Polls `/api/status` to conditionally show features.
+- **Domain** (`domains/reddash/`): Schema, system prompt, data generator for the food delivery domain.
+
+## Key Patterns
+
+- `/api/status` returns which services are configured — drives progressive UI reveal
+- Each base class's `is_configured()` checks both credentials AND exercise implementation
+- The hook pattern: base class provides boilerplate, exercise overrides methods that return `None` by default
+- Two data loading phases: `make seed-data` (redis-py direct) and `make setup-surface && make load-data` (Context Surfaces SDK)
+- Pre-generated JSONL data in `output/reddash/` includes embeddings
+
+## Module Order
+
+0. Setup (Redis Cloud + env)
+1. Vector Search (`exercises/vector_search.py`) — VectorQuery with redisvl
+2. Semantic Router (`exercises/semantic_router.py`) — Route definitions + classification
+3. LangCache (`exercises/langcache.py`) — cache search/store request bodies
+4. Context Retriever (`exercises/context_retriever.py`) — cloud setup + guided exploration (no code exercise)
+5. Agent Memory (`exercises/agent_memory.py`) — session event + memory search payloads
+
+## Conventions
+
+- Python 3.11+, managed with uv
+- Ruff for linting (line-length 100)
+- Import chain: `main.py` → `services/` (re-exports) → `exercises/` → `bases/`
+- Settings via pydantic-settings from `.env`

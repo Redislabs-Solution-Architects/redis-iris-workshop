@@ -1,0 +1,20 @@
+{"item_id": "ITEM_001", "order_id": "ORD_001", "item_name": "Spicy Tuna Roll", "quantity": 2, "unit_price": 14.0, "modifications": "extra spicy", "special_instructions": null}
+{"item_id": "ITEM_002", "order_id": "ORD_001", "item_name": "Miso Soup", "quantity": 1, "unit_price": 5.5, "modifications": null, "special_instructions": null}
+{"item_id": "ITEM_003", "order_id": "ORD_001", "item_name": "Edamame", "quantity": 1, "unit_price": 4.5, "modifications": "lightly salted", "special_instructions": null}
+{"item_id": "ITEM_004", "order_id": "ORD_002", "item_name": "Margherita Pizza", "quantity": 1, "unit_price": 18.0, "modifications": "extra basil", "special_instructions": null}
+{"item_id": "ITEM_005", "order_id": "ORD_002", "item_name": "Caesar Salad", "quantity": 1, "unit_price": 12.0, "modifications": "dressing on the side", "special_instructions": null}
+{"item_id": "ITEM_006", "order_id": "ORD_003", "item_name": "Classic Burger", "quantity": 1, "unit_price": 11.99, "modifications": "no pickles", "special_instructions": null}
+{"item_id": "ITEM_007", "order_id": "ORD_003", "item_name": "Fries", "quantity": 1, "unit_price": 4.5, "modifications": null, "special_instructions": null}
+{"item_id": "ITEM_008", "order_id": "ORD_003", "item_name": "Milkshake", "quantity": 1, "unit_price": 6.5, "modifications": "chocolate", "special_instructions": null}
+{"item_id": "ITEM_009", "order_id": "ORD_004", "item_name": "Veggie Burger", "quantity": 1, "unit_price": 10.99, "modifications": null, "special_instructions": null}
+{"item_id": "ITEM_010", "order_id": "ORD_004", "item_name": "Side Salad", "quantity": 1, "unit_price": 5.0, "modifications": null, "special_instructions": null}
+{"item_id": "ITEM_011", "order_id": "ORD_005", "item_name": "Pasta Carbonara", "quantity": 1, "unit_price": 22.0, "modifications": null, "special_instructions": null}
+{"item_id": "ITEM_012", "order_id": "ORD_005", "item_name": "Tiramisu", "quantity": 1, "unit_price": 12.0, "modifications": null, "special_instructions": null}
+{"item_id": "ITEM_013", "order_id": "ORD_005", "item_name": "Garlic Bread", "quantity": 1, "unit_price": 7.0, "modifications": null, "special_instructions": null}
+{"item_id": "ITEM_014", "order_id": "ORD_006", "item_name": "Kung Pao Chicken", "quantity": 1, "unit_price": 15.75, "modifications": "mild", "special_instructions": null}
+{"item_id": "ITEM_015", "order_id": "ORD_006", "item_name": "Fried Rice", "quantity": 1, "unit_price": 8.0, "modifications": null, "special_instructions": null}
+{"item_id": "ITEM_016", "order_id": "ORD_006", "item_name": "Spring Rolls", "quantity": 2, "unit_price": 3.5, "modifications": null, "special_instructions": null}
+{"item_id": "ITEM_017", "order_id": "ORD_007", "item_name": "Burrito Bowl", "quantity": 1, "unit_price": 13.99, "modifications": "no sour cream", "special_instructions": null}
+{"item_id": "ITEM_018", "order_id": "ORD_007", "item_name": "Chips & Guac", "quantity": 1, "unit_price": 6.0, "modifications": null, "special_instructions": null}
+{"item_id": "ITEM_019", "order_id": "ORD_008", "item_name": "Cheeseburger", "quantity": 1, "unit_price": 12.5, "modifications": null, "special_instructions": null}
+{"item_id": "ITEM_020", "order_id": "ORD_008", "item_name": "Onion Rings", "quantity": 1, "unit_price": 6.0, "modifications": null, "special_instructions": null}
