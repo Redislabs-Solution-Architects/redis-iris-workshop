@@ -65,15 +65,18 @@ class MemoryBase:
         self.settings = settings
         self._async_client: httpx.AsyncClient | None = None
 
-    def is_configured(self) -> bool:
-        """Return True when credentials are present AND hooks are implemented."""
-        if not (
+    def has_credentials(self) -> bool:
+        """Return True when API credentials are present (ignores exercise completion)."""
+        return bool(
             self.settings.memory_api_base_url
             and self.settings.memory_store_id
             and self.settings.memory_api_key
-        ):
+        )
+
+    def is_configured(self) -> bool:
+        """Return True when credentials are present AND hooks are implemented."""
+        if not self.has_credentials():
             return False
-        # Probe the hook -- if it still returns None the exercise is incomplete.
         probe = self.long_term_search_payload(
             text="probe",
             owner_id="probe",

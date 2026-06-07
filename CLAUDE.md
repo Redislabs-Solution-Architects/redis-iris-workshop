@@ -37,8 +37,8 @@ Set `USE_SOLUTIONS=1` to run with all exercises pre-filled.
 0. Setup (Redis Cloud + env)
 1. Vector Search (`exercises/vector_search.py`) — VectorQuery with redisvl
 2. Semantic Router (`exercises/semantic_router.py`) — Route definitions + classification
-3. LangCache (`exercises/langcache.py`) — cache search/store request bodies
-4. Context Retriever (`exercises/context_retriever.py`) — cloud setup + guided exploration (no code exercise)
+3. Context Retriever (`exercises/context_retriever.py`) — cloud setup + guided exploration (no code exercise)
+4. LangCache (`exercises/langcache.py`) — cache search/store request bodies
 5. Agent Memory (`exercises/agent_memory.py`) — session event + memory search payloads
 
 ## Conventions

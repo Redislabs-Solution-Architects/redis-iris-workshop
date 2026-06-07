@@ -67,6 +67,16 @@ export default function App() {
   }, [mode]);
 
   useEffect(() => {
+    if (!status) return;
+    const hasIris = !!(status.context_surfaces_enabled || status.langcache_enabled || status.memory_enabled);
+    if (hasIris && mode === "simple_rag") {
+      setMode("context_surfaces");
+    } else if (!hasIris && mode === "context_surfaces") {
+      setMode("simple_rag");
+    }
+  }, [status]);
+
+  useEffect(() => {
     scrollRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, isLoading]);
 
@@ -309,7 +319,7 @@ export default function App() {
         </div>
         <div className="topbar-actions">
           <a
-            href="http://localhost:8080"
+            href="https://redis-iris-workshop.vercel.app/"
             target="_blank"
             rel="noopener noreferrer"
             className="topbar-guide-link"
@@ -339,7 +349,7 @@ export default function App() {
             onModeChange={handleModeChange}
             starterPrompts={visiblePrompts}
             onPrefill={handlePrefill}
-            showRealtimeMode={status?.context_surfaces_enabled ?? false}
+            showRealtimeMode={!!(status?.context_surfaces_enabled || status?.langcache_enabled || status?.memory_enabled)}
           />
         ) : (
           <ConversationView

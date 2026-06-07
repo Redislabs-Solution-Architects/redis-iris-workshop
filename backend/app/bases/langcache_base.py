@@ -1,13 +1,17 @@
-"""Base class for Module 3: LangCache (Semantic Caching).
+"""Base class for Module 4: LangCache (Semantic Caching).
 
 Subclasses only need to override ``search_request_body`` to complete the exercise.
 """
 
 from __future__ import annotations
 
+import logging
+
 import httpx
 
 from backend.app.settings import Settings
+
+log = logging.getLogger("workshop.langcache")
 
 
 class LangCacheBase:
@@ -24,11 +28,14 @@ class LangCacheBase:
         self._threshold: float = settings.langcache_threshold
         self._client: httpx.AsyncClient | None = None
 
+    def has_credentials(self) -> bool:
+        """Return True when LangCache credentials are present."""
+        return bool(self._host and self._cache_id and self._api_key)
+
     def is_configured(self) -> bool:
         """Return True when credentials are present AND hooks are implemented."""
-        if not (self._host and self._cache_id and self._api_key):
+        if not self.has_credentials():
             return False
-        # Probe the hook — if it still returns None the exercise is incomplete.
         return self.search_request_body("") is not None
 
     # ------------------------------------------------------------------
@@ -111,7 +118,7 @@ class LangCacheBase:
         attributes: dict | None = None,
     ) -> bool:
         """Store a prompt/response pair in the semantic cache."""
-        if not self.is_configured():
+        if not self.has_credentials():
             return False
 
         body = self.store_request_body(prompt, response, attributes)
@@ -120,14 +127,15 @@ class LangCacheBase:
 
         client = await self._get_client()
         try:
-            resp = await client.post(
-                f"{self._base_url()}/entries",
-                headers=self._headers(),
-                json=body,
-            )
+            url = f"{self._base_url()}/entries"
+            resp = await client.post(url, headers=self._headers(), json=body)
             resp.raise_for_status()
             return True
-        except Exception:
+        except httpx.HTTPStatusError as exc:
+            log.warning("LangCache store failed: %s — body: %s", exc, exc.response.text)
+            return False
+        except Exception as exc:
+            log.warning("LangCache store failed: %s", exc)
             return False
 
     async def close(self) -> None:

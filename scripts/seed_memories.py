@@ -14,11 +14,12 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
+from backend.app.services.memory_service import MemoryService
 from backend.app.settings import get_settings
 
 SEED_MEMORIES = [
     {
-        "text": "Prefers contactless delivery",
+        "text": "Alex prefers takeout instead of delivery.",
         "memory_type": "semantic",
         "topics": ["delivery", "preferences"],
     },
@@ -34,7 +35,7 @@ def main() -> None:
     settings = get_settings()
     service = MemoryService(settings)
 
-    if not service.is_configured():
+    if not service.has_credentials():
         print("Memory service is not configured.")
         print("Set MEMORY_API_BASE_URL, MEMORY_STORE_ID, and MEMORY_API_KEY in .env")
         sys.exit(1)
@@ -44,6 +45,7 @@ def main() -> None:
 
     print("Searching for existing long-term memories...")
     import httpx
+    from backend.app.services.memory_service import sanitize_owner_id
 
     base = settings.memory_api_base_url.rstrip("/")
     store_id = settings.memory_store_id
@@ -68,7 +70,7 @@ def main() -> None:
                 "filterOp": "all",
                 "limit": 50,
                 "filter": {
-                    "ownerId": {"eq": owner_id},
+                    "ownerId": {"eq": sanitize_owner_id(owner_id)},
                     "namespace": {"eq": namespace},
                 },
             },
@@ -100,7 +102,6 @@ def main() -> None:
         print(f"Seeding {len(SEED_MEMORIES)} memories...")
         import uuid
         for entry in SEED_MEMORIES:
-            from backend.app.services.memory_service import sanitize_owner_id
             payload = {
                 "memories": [
                     {

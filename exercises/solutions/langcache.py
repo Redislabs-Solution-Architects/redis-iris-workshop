@@ -1,4 +1,4 @@
-"""Module 3: LangCache — Reference Solution."""
+"""Module 4: LangCache — Reference Solution."""
 
 from backend.app.bases.langcache_base import LangCacheBase
 

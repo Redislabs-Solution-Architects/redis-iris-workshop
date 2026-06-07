@@ -1,4 +1,4 @@
-"""Module 5: Agent Memory -- open the workshop guide at localhost:8080 for guidance."""
+"""Module 5: Agent Memory -- open the workshop guide for guidance."""
 
 from __future__ import annotations
 
@@ -13,7 +13,7 @@ class MemoryService(MemoryBase):
 
         Return a dict with:
             "text": ???,                  # the search query
-            "similarityThreshold": ???,   # 0–1, try 0.7
+            "similarityThreshold": ???,   # 0–1, try 0.2
             "filterOp": ???,              # "all" means every filter must match
             "limit": ???,                 # how many memories to return
             "filter": {                   # scope to this user and app

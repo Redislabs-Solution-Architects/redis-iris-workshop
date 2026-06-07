@@ -41,7 +41,7 @@ class ReddashDomain:
             logo_path="domains/reddash/assets/logo.svg",
             demo_steps=[
                 "Why is my order running late?",
-                "Please remember that I prefer contactless delivery and spicy food for future orders.",
+                "Please remember that I prefer takeout and spicy food for future orders.",
                 "Click Memory",
                 "Given what you know about me, look at my recent orders and tell me what I should reorder tonight and how it should be delivered.",
             ],
@@ -236,9 +236,9 @@ class ReddashDomain:
         if tool_name == self.manifest.identity.tool_name:
             identity = self.manifest.identity
             return {
-                identity.id_field: os.getenv(identity.id_env_var, identity.default_id),
-                "name": os.getenv(identity.name_env_var, identity.default_name),
-                "email": os.getenv(identity.email_env_var, identity.default_email),
+                identity.id_field: os.getenv(identity.id_env_var) or identity.default_id,
+                "name": os.getenv(identity.name_env_var) or identity.default_name,
+                "email": os.getenv(identity.email_env_var) or identity.default_email,
             }
         if tool_name == "get_current_time":
             return {"current_time": "2026-05-21T22:10:00+00:00", "timezone": "UTC"}
@@ -319,6 +319,7 @@ class ReddashDomain:
             "policies": len(records.get("Policy", [])),
         }
         client = create_redis_client(settings)
+        client.delete(self.manifest.namespace.dataset_meta_key)
         client.execute_command(
             "JSON.SET",
             self.manifest.namespace.dataset_meta_key,

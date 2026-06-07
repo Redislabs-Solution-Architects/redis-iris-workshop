@@ -8,7 +8,7 @@ class MemoryService(MemoryBase):
     def long_term_search_payload(self, *, text, owner_id, session_id, limit):
         return {
             "text": text,
-            "similarityThreshold": 0.7,
+            "similarityThreshold": 0.2,
             "filterOp": "all",
             "limit": limit or 5,
             "filter": {

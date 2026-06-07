@@ -1,4 +1,4 @@
-"""Module 4: Context Retriever — Reference (identical to stub, no code exercise)."""
+"""Module 3: Context Retriever — Reference (identical to stub, no code exercise)."""
 
 from backend.app.bases.context_base import ContextSurfaceBase
 

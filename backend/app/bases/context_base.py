@@ -1,4 +1,4 @@
-"""Base class for Module 4: Context Retriever (MCP Tools).
+"""Base class for Module 3: Context Retriever (MCP Tools).
 
 Fully pre-built — no exercise overrides needed. The exercise for this
 module is cloud setup + guided exploration, not code.
@@ -10,9 +10,12 @@ import json
 import logging
 from typing import Any
 
-from context_surfaces import UnifiedClient
-
 from backend.app.settings import Settings
+
+try:
+    from context_surfaces import UnifiedClient
+except ImportError:
+    UnifiedClient = None
 
 log = logging.getLogger("workshop.mcp")
 
@@ -31,7 +34,7 @@ class ContextSurfaceBase:
 
     def is_configured(self) -> bool:
         """Return True when the MCP agent key is set."""
-        return bool(self.settings.mcp_agent_key)
+        return UnifiedClient is not None and bool(self.settings.mcp_agent_key)
 
     # ------------------------------------------------------------------
     # Internals (pre-built)

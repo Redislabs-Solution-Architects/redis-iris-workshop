@@ -1,4 +1,4 @@
-"""Module 1: Vector Search — open the workshop guide at localhost:8080 for guidance."""
+"""Module 1: Vector Search — open the workshop guide for guidance."""
 
 from redisvl.query import VectorQuery
 

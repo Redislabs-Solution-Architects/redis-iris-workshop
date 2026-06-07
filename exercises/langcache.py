@@ -1,4 +1,4 @@
-"""Module 3: LangCache -- open the workshop guide at localhost:8080 for guidance."""
+"""Module 4: LangCache -- open the workshop guide for guidance."""
 
 from __future__ import annotations
 

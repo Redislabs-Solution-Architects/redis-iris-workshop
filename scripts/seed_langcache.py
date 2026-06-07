@@ -7,6 +7,7 @@ Usage:
 from __future__ import annotations
 
 import asyncio
+import logging
 import sys
 from pathlib import Path
 
@@ -25,28 +26,32 @@ SEED_ENTRIES = [
             "you may qualify for a **full order refund**. Please contact support with your "
             "order details to start the process."
         ),
-        "attributes": {"industry": "food-delivery", "mode": "context_surfaces", "user_id": "demo"},
     },
 ]
 
 
 async def main() -> None:
+    logging.basicConfig(level=logging.INFO)
     settings = get_settings()
     service = LangCacheService(settings)
 
-    if not service.is_configured():
+    if not service.has_credentials():
         print("LangCache is not configured.")
         print("Set LANGCACHE_HOST, LANGCACHE_CACHE_ID, and LANGCACHE_API_KEY in .env")
         sys.exit(1)
 
     print(f"Seeding {len(SEED_ENTRIES)} entries...")
     for entry in SEED_ENTRIES:
-        ok = await service.store(
-            prompt=entry["prompt"],
-            response=entry["response"],
-            attributes=entry.get("attributes"),
-        )
-        status = "OK" if ok else "FAILED"
+        try:
+            ok = await service.store(
+                prompt=entry["prompt"],
+                response=entry["response"],
+                attributes=entry.get("attributes"),
+            )
+            status = "OK" if ok else "FAILED"
+        except Exception as exc:
+            ok = False
+            status = f"ERROR: {exc}"
         print(f"  [{status}] {entry['prompt'][:60]}")
 
     await service.close()

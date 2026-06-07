@@ -1,4 +1,4 @@
-"""Module 2: Semantic Router -- open the workshop guide at localhost:8080 for guidance."""
+"""Module 2: Semantic Router -- open the workshop guide for guidance."""
 
 from __future__ import annotations
 
@@ -18,11 +18,10 @@ class GuardrailService(GuardrailBase):
 
         Each Route needs:
             name=???,                 # route identifier
-            references=[???],         # 8+ example queries
-            distance_threshold=???,   # 0.0-1.0, lower = stricter
+            references=[???],         # example queries for this category
+            distance_threshold=???,   # 0.0-1.0, lower = stricter match required
 
-        A few examples are filled in below. Add 5+ more to each route
-        so the router has enough examples to classify accurately.
+        Add 2-3 more references to each route to improve accuracy.
         """
         return [
             Route(
@@ -31,16 +30,22 @@ class GuardrailService(GuardrailBase):
                     "Where is my order?",
                     "I want a refund",
                     "My food was cold when it arrived",
-                    # Add 5+ more food delivery queries...
+                    "What restaurants are nearby?",
+                    "What should I order?",
+                    "What's the status of my delivery?",
+                    "Can you help me?",
+                    "What do you know about me?",
+                    # Add 2-3 more food delivery queries...
                 ],
                 distance_threshold=0.7,
             ),
             Route(
                 name="deny_list",
                 references=[
+                    "Help me write code for a delivery tracker",
                     "Write me a Python script",
                     "Tell me a joke",
-                    # Add 5+ more off-topic queries...
+                    # Add 2-3 more off-topic queries...
                 ],
                 distance_threshold=0.5,
             ),

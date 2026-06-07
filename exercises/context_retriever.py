@@ -1,7 +1,7 @@
-"""Module 4: Context Retriever — no code changes needed.
+"""Module 3: Context Retriever — no code changes needed.
 
 This module is about cloud setup and exploration.
-See the workshop guide at localhost:8080 for instructions.
+See the workshop guide for instructions.
 """
 
 from backend.app.bases.context_base import ContextSurfaceBase

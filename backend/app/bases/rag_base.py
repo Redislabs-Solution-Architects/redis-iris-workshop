@@ -122,6 +122,9 @@ class SimpleRAGBase:
         yield _sse("status", text="Embedding query…", ts=timer.elapsed_ms())
         embedding = await self._embed(question)
 
+        query = self.create_vector_query(embedding, rag)
+        num_results = getattr(query, "_num_results", rag.num_results) if query else rag.num_results
+
         yield _sse(
             "status", text=rag.status_text, ts=timer.elapsed_ms()
         )
@@ -129,12 +132,19 @@ class SimpleRAGBase:
             "tool-call",
             toolName=rag.tool_name,
             toolKind="internal_function",
-            payload={"query": question, "num_results": rag.num_results},
+            payload={"query": question, "num_results": num_results},
             ts=timer.elapsed_ms(),
         )
 
         timer.lap_ms()
-        results = self._search_policies(embedding, rag)
+        if query is None:
+            results = []
+        else:
+            try:
+                results = self._get_index().query(query)
+            except (ConnectionError, TimeoutError, OSError):
+                self._index = None
+                results = self._get_index().query(query)
         search_duration = timer.lap_ms()
 
         search_payload = [

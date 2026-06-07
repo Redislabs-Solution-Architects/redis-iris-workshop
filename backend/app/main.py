@@ -280,7 +280,7 @@ async def domain_config() -> JSONResponse:
 @app.get("/api/memory/dashboard")
 async def memory_dashboard(thread_id: str | None = None) -> JSONResponse:
     identity = domain.manifest.identity
-    current_user_id = os.getenv(identity.id_env_var, identity.default_id)
+    current_user_id = os.getenv(identity.id_env_var) or identity.default_id
     if not memory_service.is_configured():
         return JSONResponse(
             {
@@ -352,7 +352,7 @@ async def cs_event_stream(request: ChatRequest) -> AsyncIterator[str]:
     thread_id = request.thread_id or "default"
     latest_message = request.messages[-1].content if request.messages else ""
     identity = domain.manifest.identity
-    current_user_id = os.getenv(identity.id_env_var, identity.default_id)
+    current_user_id = os.getenv(identity.id_env_var) or identity.default_id
 
     log.info("--- REQUEST [thread=%s] %s", thread_id[:8], latest_message[:80])
 
