@@ -1,68 +1,75 @@
 # Redis Iris Workshop
 
-Build a fully functional AI-powered food delivery support agent — step by step — using **Redis Iris**, the unified context engine for AI applications.
+Build a smarter, faster AI agent with [Redis Iris](https://redis.io/iris/)  hands on, step by step.
+
+> **Workshop Guide** → [redis-iris-workshop.vercel.app](https://redis-iris-workshop.vercel.app)
+
+## What is this?
+
+A hands on workshop where you pick an industry vertical and build an AI support agent powered by Redis Iris. You edit 5 exercise files. Everything else is pre-built.
+
+**Pick a vertical:**
+
+| Vertical | Agent | Domain Key |
+|----------|-------|------------|
+| Digital Native | Food delivery support | `digital-native` |
+| Healthcare | Patient portal assistant | `healthcare` |
+| Retail | Electronics shopping concierge | `retail` |
+| Finance | Stock research analyst | `finance` |
+| Banking | Customer care agent | `banking` |
 
 ## Quick Start
 
 ```bash
-git clone <repo-url> && cd redis-iris-workshop
+git clone https://github.com/Redislabs-Solution-Architects/redis-iris-workshop.git
+cd redis-iris-workshop
 make install
 cp .env.example .env   # fill in Redis + OpenAI credentials
 make seed-data
 make dev
 ```
 
-Open [localhost:3040](http://localhost:3040) for the app, and follow the [workshop guide](https://redis-iris-workshop.vercel.app).
+Open [localhost:3040](http://localhost:3040) and follow the [workshop guide](https://redis-iris-workshop.vercel.app).
 
-## What You'll Build
+## What You Build
 
-**Redis Eats** — a food delivery support agent with 5 Redis Iris components:
+Each module adds one Redis Iris capability to your agent:
 
-| # | Module | What You'll Add | Exercise File |
-|---|--------|----------------|---------------|
-| 0 | Setup | Redis Cloud database | — |
-| 1 | Vector Search | RAG over policy documents | `exercises/vector_search.py` |
-| 2 | Semantic Router | Off-topic query guardrails | `exercises/semantic_router.py` |
-| 3 | LangCache | Semantic caching | `exercises/langcache.py` |
-| 4 | Context Retriever | Real-time data via MCP tools | `exercises/context_retriever.py` |
-| 5 | Agent Memory | Session + long-term memory | `exercises/agent_memory.py` |
-
-## How It Works
-
-You only edit **5 exercise files** in `exercises/` — everything else is pre-built. Each exercise is ~10-25 lines of Redis-specific code. The boilerplate lives in `backend/app/bases/`.
-
-After each module, restart the app and watch the new capability appear in the UI.
-
-## Workshop Guide
-
-The full workshop guide is at **[redis-iris-workshop.vercel.app](https://redis-iris-workshop.vercel.app)** — open it in a separate tab as you work through the exercises.
+| # | Module | What You Add | Exercise File |
+|---|--------|-------------|---------------|
+| 0 | Setup | Redis Cloud database + environment | — |
+| 1 | Vector Search | Search policy documents by meaning | `exercises/<domain>/vector_search.py` |
+| 2 | Semantic Router | Block off topic queries before the LLM | `exercises/<domain>/semantic_router.py` |
+| 3 | Context Retriever | Query live business data | `exercises/<domain>/context_retriever.py` |
+| 4 | LangCache | Cache responses so repeats return instantly | `exercises/<domain>/langcache.py` |
+| 5 | Agent Memory | Remember users across conversations | `exercises/<domain>/agent_memory.py` |
 
 ## Project Structure
 
 ```
-exercises/                  ← You edit these (5 files)
-exercises/solutions/        ← Reference implementations
-backend/app/bases/          ← Pre-built boilerplate
-backend/app/services/       ← Re-export layer (don't edit)
-backend/app/                ← Frozen infrastructure
-frontend/                   ← React + Vite UI
-scripts/                    ← Data seeding
-output/<domain>/             ← Pre-generated data
+exercises/<domain>/             ← You edit these (5 files per domain)
+exercises/<domain>/solutions/   ← Reference implementations
+backend/app/bases/              ← Pre-built boilerplate
+backend/app/services/           ← Dynamic import layer (don't edit)
+backend/app/                    ← FastAPI + LangGraph agent
+frontend/                       ← React + Vite
+domains/<domain>/               ← Schema, prompts, branding per vertical
+scripts/                        ← Data seeding
 ```
 
 ## Make Targets
 
-```
-make install              Install all dependencies
-make dev                  Run backend + frontend
-make seed-data            Load policies into Redis (Module 0)
-make seed-langcache       Seed a cache entry (Module 3)
-make setup-surface        Create Context Surface (Module 4)
-make load-data            Load entity data (Module 4)
-make seed-memories        Seed long-term memories (Module 5)
-make status               Check which modules are active
-make reset                Flush Redis + re-seed
-```
+| Command | Description |
+|---------|-------------|
+| `make install` | Install all dependencies |
+| `make dev` | Run backend + frontend |
+| `make seed-data` | Module 0 — Load policies into Redis |
+| `make setup-surface` | Module 3 — Create Context Surface + agent key |
+| `make load-data` | Module 3 — Load entity data |
+| `make seed-langcache` | Module 4 — Seed a LangCache entry |
+| `make seed-memories` | Module 5 — Seed long term memories |
+| `make status` | Check which modules are active |
+| `make reset` | Flush Redis + re-seed |
 
 ## Prerequisites
 
@@ -70,3 +77,7 @@ make reset                Flush Redis + re-seed
 - Node.js 18+ and npm
 - [Redis Cloud](https://redis.io/try-free/) account (free tier)
 - OpenAI API key (provided by instructor)
+
+## Solutions
+
+Set `USE_SOLUTIONS=1` in your `.env` to run with all exercises pre-filled.

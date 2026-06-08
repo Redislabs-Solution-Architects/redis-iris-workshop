@@ -18,9 +18,9 @@ help:
 	@echo ""
 	@echo "  Data (run in module order):"
 	@echo "    make seed-data        Module 0 — Load policies into Redis for Simple RAG"
-	@echo "    make seed-langcache   Module 3 — Seed one LangCache entry"
-	@echo "    make setup-surface    Module 4 — Create Context Surface + agent key"
-	@echo "    make load-data        Module 4 — Load all entities via Context Surfaces"
+	@echo "    make setup-surface    Module 3 — Create Context Surface + agent key"
+	@echo "    make load-data        Module 3 — Load all entities via Context Surfaces"
+	@echo "    make seed-langcache   Module 4 — Seed one LangCache entry"
 	@echo "    make seed-memories    Module 5 — Seed long-term memories"
 	@echo ""
 	@echo "  Utilities:"
@@ -58,16 +58,16 @@ dev:
 seed-data:
 	@uv run python scripts/seed_data.py --domain $(DOMAIN)
 
-# ── Module 3: Seed LangCache ──
-seed-langcache:
-	@uv run python -m scripts.seed_langcache --domain $(DOMAIN)
-
-# ── Module 4: Context Retriever ──
+# ── Module 3: Context Retriever ──
 setup-surface:
 	@uv run python scripts/setup_surface.py --domain $(DOMAIN)
 
 load-data:
 	@uv run python scripts/load_data.py --domain $(DOMAIN)
+
+# ── Module 4: Seed LangCache ──
+seed-langcache:
+	@uv run python -m scripts.seed_langcache --domain $(DOMAIN)
 
 # ── Module 5: Agent Memory ──
 seed-memories:
