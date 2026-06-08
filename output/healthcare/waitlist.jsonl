@@ -1,0 +1,4 @@
+{"id": "W001", "patient_id": "P002", "preferred_provider_id": "DR001", "location_id": "LOC001", "appointment_type": "consultation", "flexibility": "mornings", "added_date": "2026-03-08", "notes": "Wants to switch from Dr. Patel"}
+{"id": "W002", "patient_id": "P004", "preferred_provider_id": "DR003", "location_id": "LOC002", "appointment_type": "procedure", "flexibility": "any_time", "added_date": "2026-03-11", "notes": "Waiting for insurance to be resolved"}
+{"id": "W003", "patient_id": "P006", "preferred_provider_id": "DR001", "location_id": "LOC001", "appointment_type": "checkup", "flexibility": "afternoons", "added_date": "2026-03-10", "notes": "Missed first appointment, wants to reschedule"}
+{"id": "W004", "patient_id": "P007", "preferred_provider_id": "DR003", "location_id": "LOC002", "appointment_type": "follow_up", "flexibility": "specific_days", "added_date": "2026-03-12", "notes": "Only available Tuesdays and Thursdays"}

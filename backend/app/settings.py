@@ -42,8 +42,8 @@ class Settings(BaseSettings):
     memory_store_id: str = Field(default="")
     memory_api_key: str = Field(default="")
     memory_owner_id: str = Field(default="")
-    memory_actor_id: str = Field(default="reddash-agent")
-    memory_namespace: str = Field(default="reddash-demo")
+    memory_actor_id: str = Field(default="")
+    memory_namespace: str = Field(default="")
     memory_similarity_threshold: float = Field(default=0.7)
     memory_limit: int = Field(default=6)
 

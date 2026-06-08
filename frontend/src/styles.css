@@ -74,7 +74,7 @@ button { cursor: pointer; border: none; background: none; }
 
 /* ── Landing warm background ───────────────────────── */
 .shell--landing {
-  background: var(--color-warm-bg);
+  background: var(--landing-bg, var(--color-warm-bg));
   position: relative;
   overflow: hidden;
 }
@@ -94,13 +94,13 @@ button { cursor: pointer; border: none; background: none; }
 
 .shell--landing::before {
   left: 0;
-  background-image: url('/leftImageMain.svg');
+  background-image: var(--landing-left-img, url('/leftImageMain.svg'));
   background-position: left top;
 }
 
 .shell--landing::after {
   right: 0;
-  background-image: url('/rightImageMain.svg');
+  background-image: var(--landing-right-img, url('/rightImageMain.svg'));
   background-position: right top;
 }
 

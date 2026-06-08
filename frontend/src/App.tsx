@@ -85,6 +85,21 @@ export default function App() {
   }, [domain]);
 
   useEffect(() => {
+    if (!domain) return;
+    const root = document.documentElement;
+    if (domain.theme?.landing_bg) {
+      root.style.setProperty("--landing-bg", domain.theme.landing_bg);
+    }
+    root.style.setProperty("--landing-left-img", `url('/backgrounds/${domain.id}/left.svg')`);
+    root.style.setProperty("--landing-right-img", `url('/backgrounds/${domain.id}/right.svg')`);
+    return () => {
+      root.style.removeProperty("--landing-bg");
+      root.style.removeProperty("--landing-left-img");
+      root.style.removeProperty("--landing-right-img");
+    };
+  }, [domain]);
+
+  useEffect(() => {
     if (autoOpenedRef.current || !hasMessages) return;
     let latest: ChatMessage | undefined;
     for (let i = messages.length - 1; i >= 0; i--) {

@@ -1,8 +1,14 @@
+import importlib
 import os as _os
 
-if _os.getenv("USE_SOLUTIONS"):
-    from exercises.solutions.agent_memory import MemoryService  # noqa: F401
-else:
-    from exercises.agent_memory import MemoryService  # noqa: F401
+_domain = _os.getenv("DEMO_DOMAIN") or "reddash"
+_use_solutions = _os.getenv("USE_SOLUTIONS", "")
 
-from backend.app.bases.memory_base import sanitize_owner_id  # noqa: F401
+if _use_solutions:
+    _mod = importlib.import_module(f"exercises.{_domain}.solutions.agent_memory")
+else:
+    _mod = importlib.import_module(f"exercises.{_domain}.agent_memory")
+
+MemoryService = _mod.MemoryService  # noqa: F401
+
+from backend.app.bases.memory_base import sanitize_owner_id  # noqa: E402, F401

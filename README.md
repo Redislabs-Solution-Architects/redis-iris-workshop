@@ -47,7 +47,7 @@ backend/app/services/       ← Re-export layer (don't edit)
 backend/app/                ← Frozen infrastructure
 frontend/                   ← React + Vite UI
 scripts/                    ← Data seeding
-output/reddash/             ← Pre-generated data
+output/<domain>/             ← Pre-generated data
 ```
 
 ## Make Targets

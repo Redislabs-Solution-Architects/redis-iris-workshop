@@ -18,7 +18,8 @@ class MemoryService(MemoryBase):
             "limit": ???,                 # how many memories to return
             "filter": {                   # scope to this user and app
                 "ownerId": {"eq": ???},   # use sanitize_owner_id(owner_id)
-                "namespace": {"eq": ???}, # "reddash-demo"
+                "namespace": {"eq": ???}, # "finance-demo"
             },
+        }
         """
         return None  # Replace with your implementation

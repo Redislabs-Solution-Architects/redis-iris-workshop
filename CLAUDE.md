@@ -2,7 +2,9 @@
 
 ## What This Is
 
-A hands-on developer workshop where learners build a food delivery support agent ("Redis Eats") step-by-step using Redis Iris components. Learners edit 5 exercise files in `exercises/` — everything else is pre-built.
+A hands-on developer workshop where learners pick an industry domain and build an AI support agent step-by-step using Redis Iris components. Learners edit 5 exercise files in `exercises/<domain>/` — everything else is pre-built.
+
+**Domains:** digital-native (Redis Eats), healthcare (RedHealthConnect), retail (ElectroHub), finance (ShiftIQ), banking (Radish Bank). Selected via `DEMO_DOMAIN` env var (default: digital-native).
 
 ## Running
 
@@ -16,13 +18,13 @@ Set `USE_SOLUTIONS=1` to run with all exercises pre-filled.
 
 ## Architecture
 
-- **Exercises** (`exercises/`): The 5 files learners implement. Each subclasses a base from `backend/app/bases/` and overrides 2-3 hook methods.
+- **Exercises** (`exercises/<domain>/`): The 5 files learners implement per domain. Each subclasses a base from `backend/app/bases/` and overrides 2-3 hook methods.
 - **Base Classes** (`backend/app/bases/`): Pre-built boilerplate — HTTP clients, error handling, SSE streaming. Exercise files inherit from these.
-- **Service Re-exports** (`backend/app/services/`): One-line files that re-export from `exercises/`. Supports `USE_SOLUTIONS` env var to switch to reference implementations.
-- **Solutions** (`exercises/solutions/`): Complete exercise implementations.
+- **Service Re-exports** (`backend/app/services/`): Use `importlib.import_module(f"exercises.{DEMO_DOMAIN}...")` to dynamically load the active domain's exercises. Supports `USE_SOLUTIONS` env var to switch to reference implementations.
+- **Solutions** (`exercises/<domain>/solutions/`): Complete exercise implementations per domain.
 - **Backend** (`backend/app/`): FastAPI + SSE streaming (`main.py`), LangGraph ReAct agent (`langgraph_agent.py`).
-- **Frontend** (`frontend/`): React + Vite. Polls `/api/status` to conditionally show features.
-- **Domain** (`domains/reddash/`): Schema, system prompt, data generator for the food delivery domain.
+- **Frontend** (`frontend/`): React + Vite. Polls `/api/status` to conditionally show features. Dynamic backgrounds/logos per domain via CSS custom properties.
+- **Domains** (`domains/<domain>/`): Each domain has schema, system prompt, data generator, branding, and seed data config.
 
 ## Key Patterns
 
@@ -30,16 +32,17 @@ Set `USE_SOLUTIONS=1` to run with all exercises pre-filled.
 - Each base class's `is_configured()` checks both credentials AND exercise implementation
 - The hook pattern: base class provides boilerplate, exercise overrides methods that return `None` by default
 - Two data loading phases: `make seed-data` (redis-py direct) and `make setup-surface && make load-data` (Context Surfaces SDK)
-- Pre-generated JSONL data in `output/reddash/` includes embeddings
+- Pre-generated JSONL data in `output/<domain>/` includes embeddings
+- Frontend backgrounds in `frontend/public/backgrounds/<domain>/left.svg, right.svg`
 
 ## Module Order
 
 0. Setup (Redis Cloud + env)
-1. Vector Search (`exercises/vector_search.py`) — VectorQuery with redisvl
-2. Semantic Router (`exercises/semantic_router.py`) — Route definitions + classification
-3. Context Retriever (`exercises/context_retriever.py`) — cloud setup + guided exploration (no code exercise)
-4. LangCache (`exercises/langcache.py`) — cache search/store request bodies
-5. Agent Memory (`exercises/agent_memory.py`) — session event + memory search payloads
+1. Vector Search (`exercises/<domain>/vector_search.py`) — VectorQuery with redisvl
+2. Semantic Router (`exercises/<domain>/semantic_router.py`) — Route definitions + classification
+3. Context Retriever (`exercises/<domain>/context_retriever.py`) — cloud setup + guided exploration (no code exercise)
+4. LangCache (`exercises/<domain>/langcache.py`) — cache search/store request bodies
+5. Agent Memory (`exercises/<domain>/agent_memory.py`) — session event + memory search payloads
 
 ## Conventions
 

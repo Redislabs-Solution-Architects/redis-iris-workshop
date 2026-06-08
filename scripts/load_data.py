@@ -5,6 +5,7 @@ from __future__ import annotations
 import argparse
 import asyncio
 import importlib
+import importlib.util
 import json
 import sys
 from pathlib import Path
@@ -29,8 +30,16 @@ def load_records(*, output_dir: Path, entity_by_file: dict[str, Any]) -> dict[st
     return payloads
 
 
-def load_generated_models(module_name: str, class_names: list[str]) -> dict[str, type]:
-    module = importlib.import_module(module_name)
+def load_generated_models(module_name: str, class_names: list[str], file_path: str | None = None) -> dict[str, type]:
+    if file_path and "-" in module_name:
+        spec = importlib.util.spec_from_file_location(module_name.replace("-", "_"), ROOT / file_path)
+        if spec and spec.loader:
+            module = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(module)
+        else:
+            raise ImportError(f"Cannot load generated models from {file_path}")
+    else:
+        module = importlib.import_module(module_name)
     return {class_name: getattr(module, class_name) for class_name in class_names}
 
 
@@ -54,7 +63,9 @@ async def main() -> None:
     entity_specs = domain.get_entity_specs()
     entity_by_file = {spec.file_name: spec for spec in entity_specs}
     class_names = [spec.class_name for spec in entity_specs]
-    generated_models = load_generated_models(domain.manifest.generated_models_module, class_names)
+    generated_models = load_generated_models(
+        domain.manifest.generated_models_module, class_names, domain.manifest.generated_models_path
+    )
     output_dir = ROOT / domain.manifest.output_dir
     raw_records = load_records(output_dir=output_dir, entity_by_file=entity_by_file)
 

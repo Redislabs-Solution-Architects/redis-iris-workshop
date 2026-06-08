@@ -1,7 +1,7 @@
 BACKEND_HOST ?= 127.0.0.1
 BACKEND_PORT ?= 8040
 FRONTEND_PORT ?= 3040
-DOMAIN ?= reddash
+DOMAIN ?= $(or $(shell grep -s '^DEMO_DOMAIN=' .env | cut -d= -f2),reddash)
 
 .PHONY: help install backend-install frontend-install dev backend frontend \
 	seed-data setup-surface load-data seed-langcache seed-memories \
@@ -60,7 +60,7 @@ seed-data:
 
 # ── Module 3: Seed LangCache ──
 seed-langcache:
-	@uv run python -m scripts.seed_langcache
+	@uv run python -m scripts.seed_langcache --domain $(DOMAIN)
 
 # ── Module 4: Context Retriever ──
 setup-surface:
@@ -71,7 +71,7 @@ load-data:
 
 # ── Module 5: Agent Memory ──
 seed-memories:
-	@uv run python -m scripts.seed_memories
+	@uv run python -m scripts.seed_memories --domain $(DOMAIN)
 
 # ── Utilities ──
 status:

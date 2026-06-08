@@ -1,38 +1,37 @@
 """Seed long-term memories for the workshop demo customer.
 
-Clears existing memories, then seeds two pre-defined memories.
+Clears existing memories, then seeds memories defined in the domain config.
 
 Usage:
     uv run python -m scripts.seed_memories
+    uv run python -m scripts.seed_memories --domain healthcare
 """
 
 from __future__ import annotations
 
+import argparse
 import os
 import sys
+import uuid
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from backend.app.services.memory_service import MemoryService
-from backend.app.settings import get_settings
+import httpx
 
-SEED_MEMORIES = [
-    {
-        "text": "Alex prefers takeout instead of delivery.",
-        "memory_type": "semantic",
-        "topics": ["delivery", "preferences"],
-    },
-    {
-        "text": "Likes spicy food",
-        "memory_type": "semantic",
-        "topics": ["food", "preferences"],
-    },
-]
+from backend.app.core.domain_loader import load_domain
+from backend.app.services.memory_service import MemoryService
+from backend.app.bases.memory_base import sanitize_owner_id
+from backend.app.settings import get_settings
 
 
 def main() -> None:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--domain", default=os.getenv("DEMO_DOMAIN") or "reddash")
+    args = parser.parse_args()
+
     settings = get_settings()
+    domain = load_domain(args.domain)
     service = MemoryService(settings)
 
     if not service.has_credentials():
@@ -40,12 +39,16 @@ def main() -> None:
         print("Set MEMORY_API_BASE_URL, MEMORY_STORE_ID, and MEMORY_API_KEY in .env")
         sys.exit(1)
 
-    owner_id = settings.memory_owner_id or "CUST_DEMO_001"
-    print(f"Owner: {owner_id}")
+    seed_memories = domain.manifest.seed_memories
+    if not seed_memories:
+        print(f"No seed memories defined for domain '{args.domain}'.")
+        return
 
-    print("Searching for existing long-term memories...")
-    import httpx
-    from backend.app.services.memory_service import sanitize_owner_id
+    owner_id = settings.memory_owner_id or domain.manifest.identity.default_id
+    namespace = settings.memory_namespace.strip() or f"{args.domain}-demo"
+    print(f"Domain: {args.domain}")
+    print(f"Owner: {owner_id}")
+    print(f"Namespace: {namespace}")
 
     base = settings.memory_api_base_url.rstrip("/")
     store_id = settings.memory_store_id
@@ -58,9 +61,9 @@ def main() -> None:
         "Accept": "application/json",
         "Content-Type": "application/json",
     }
-    namespace = settings.memory_namespace.strip() or "reddash-demo"
 
     with httpx.Client(timeout=30.0) as client:
+        print("Searching for existing long-term memories...")
         search_resp = client.post(
             f"{base}/v1/stores/{store_id}/long-term-memory/search",
             headers=headers,
@@ -99,18 +102,17 @@ def main() -> None:
         else:
             print("  No existing memories found.")
 
-        print(f"Seeding {len(SEED_MEMORIES)} memories...")
-        import uuid
-        for entry in SEED_MEMORIES:
+        print(f"Seeding {len(seed_memories)} memories...")
+        for entry in seed_memories:
             payload = {
                 "memories": [
                     {
                         "id": str(uuid.uuid4()),
-                        "text": entry["text"],
-                        "memoryType": entry["memory_type"],
+                        "text": entry.text,
+                        "memoryType": entry.memory_type,
                         "ownerId": sanitize_owner_id(owner_id),
                         "namespace": namespace,
-                        "topics": entry["topics"],
+                        "topics": entry.topics,
                     }
                 ]
             }
@@ -120,9 +122,9 @@ def main() -> None:
                 json=payload,
             )
             if resp.status_code < 400:
-                print(f"  Seeded: {entry['text']!r}")
+                print(f"  Seeded: {entry.text!r}")
             else:
-                print(f"  FAILED: {entry['text']!r} -> {resp.status_code}: {resp.text}")
+                print(f"  FAILED: {entry.text!r} -> {resp.status_code}: {resp.text}")
 
     print("Done.")
 

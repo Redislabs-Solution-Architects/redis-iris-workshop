@@ -384,8 +384,8 @@ async def cs_event_stream(request: ChatRequest) -> AsyncIterator[str]:
 
         if not guard_result.get("allowed", True):
             blocked_message = (
-                "I'm your Redis Eats delivery assistant — I can help with orders, "
-                "deliveries, refunds, menu recommendations, and account questions. "
+                f"I'm your {domain.manifest.branding.app_name} assistant — "
+                "I can only help with questions related to this service. "
                 "What can I help you with today?"
             )
             yield sse("text-delta", delta=blocked_message, ts=timer.elapsed_ms())
@@ -732,8 +732,8 @@ async def rag_event_stream(question: str) -> AsyncIterator[str]:
         )
         if not guard_result.get("allowed", True):
             blocked_message = (
-                "I'm your Redis Eats delivery assistant — I can help with orders, "
-                "deliveries, refunds, menu recommendations, and account questions. "
+                f"I'm your {domain.manifest.branding.app_name} assistant — "
+                "I can only help with questions related to this service. "
                 "What can I help you with today?"
             )
             yield sse("text-delta", delta=blocked_message, ts=timer.elapsed_ms())

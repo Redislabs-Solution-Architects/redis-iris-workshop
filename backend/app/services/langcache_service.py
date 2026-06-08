@@ -1,6 +1,12 @@
+import importlib
 import os as _os
 
-if _os.getenv("USE_SOLUTIONS"):
-    from exercises.solutions.langcache import LangCacheService  # noqa: F401
+_domain = _os.getenv("DEMO_DOMAIN") or "reddash"
+_use_solutions = _os.getenv("USE_SOLUTIONS", "")
+
+if _use_solutions:
+    _mod = importlib.import_module(f"exercises.{_domain}.solutions.langcache")
 else:
-    from exercises.langcache import LangCacheService  # noqa: F401
+    _mod = importlib.import_module(f"exercises.{_domain}.langcache")
+
+LangCacheService = _mod.LangCacheService  # noqa: F401

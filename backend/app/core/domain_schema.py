@@ -23,6 +23,7 @@ class RelationshipSpec:
     name: str
     description: str
     source_field: str
+    target: str = ""
 
 
 @dataclass(frozen=True)

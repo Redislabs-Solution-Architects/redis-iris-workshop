@@ -1,6 +1,12 @@
+import importlib
 import os as _os
 
-if _os.getenv("USE_SOLUTIONS"):
-    from exercises.solutions.vector_search import SimpleRAGService  # noqa: F401
+_domain = _os.getenv("DEMO_DOMAIN") or "reddash"
+_use_solutions = _os.getenv("USE_SOLUTIONS", "")
+
+if _use_solutions:
+    _mod = importlib.import_module(f"exercises.{_domain}.solutions.vector_search")
 else:
-    from exercises.vector_search import SimpleRAGService  # noqa: F401
+    _mod = importlib.import_module(f"exercises.{_domain}.vector_search")
+
+SimpleRAGService = _mod.SimpleRAGService  # noqa: F401

@@ -1,6 +1,12 @@
+import importlib
 import os as _os
 
-if _os.getenv("USE_SOLUTIONS"):
-    from exercises.solutions.context_retriever import ContextSurfaceService  # noqa: F401
+_domain = _os.getenv("DEMO_DOMAIN") or "reddash"
+_use_solutions = _os.getenv("USE_SOLUTIONS", "")
+
+if _use_solutions:
+    _mod = importlib.import_module(f"exercises.{_domain}.solutions.context_retriever")
 else:
-    from exercises.context_retriever import ContextSurfaceService  # noqa: F401
+    _mod = importlib.import_module(f"exercises.{_domain}.context_retriever")
+
+ContextSurfaceService = _mod.ContextSurfaceService  # noqa: F401

@@ -1,0 +1,5 @@
+{"id": "DR001", "name": "Dr. Sofia Martinez", "specialty": "primary_care", "location_id": "LOC001", "accepting_new_patients": "yes", "languages": "en,es", "email": "s.martinez@downtownmed.com"}
+{"id": "DR002", "name": "Dr. Raj Patel", "specialty": "internal_medicine", "location_id": "LOC001", "accepting_new_patients": "yes", "languages": "en,hi", "email": "r.patel@downtownmed.com"}
+{"id": "DR003", "name": "Dr. Jennifer Kim", "specialty": "obstetrics", "location_id": "LOC002", "accepting_new_patients": "no", "languages": "en,ko", "email": "j.kim@westsidehealth.com"}
+{"id": "DR004", "name": "Dr. Marcus Thompson", "specialty": "cardiology", "location_id": "LOC001", "accepting_new_patients": "yes", "languages": "en", "email": "m.thompson@downtownmed.com"}
+{"id": "DR005", "name": "Dr. Linda Chen", "specialty": "orthopedics", "location_id": "LOC002", "accepting_new_patients": "yes", "languages": "en,zh", "email": "l.chen@westsidehealth.com"}

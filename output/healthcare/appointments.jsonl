@@ -1,0 +1,10 @@
+{"id": "A001", "patient_id": "P001", "provider_id": "DR001", "location_id": "LOC001", "datetime": "2026-03-10T09:00:00", "type": "checkup", "status": "completed", "notes": "Annual physical, all vitals normal"}
+{"id": "A002", "patient_id": "P001", "provider_id": "DR001", "location_id": "LOC001", "datetime": "2026-03-17T10:00:00", "type": "follow_up", "status": "scheduled", "notes": "Follow up on blood work"}
+{"id": "A003", "patient_id": "P002", "provider_id": "DR002", "location_id": "LOC001", "datetime": "2026-03-11T14:00:00", "type": "consultation", "status": "no_show", "notes": "Patient did not arrive, no call"}
+{"id": "A004", "patient_id": "P003", "provider_id": "DR001", "location_id": "LOC001", "datetime": "2026-03-12T11:00:00", "type": "checkup", "status": "completed", "notes": "Diabetes management review"}
+{"id": "A005", "patient_id": "P004", "provider_id": "DR003", "location_id": "LOC002", "datetime": "2026-03-11T15:30:00", "type": "procedure", "status": "cancelled", "notes": "Insurance expired, rescheduling needed"}
+{"id": "A006", "patient_id": "P005", "provider_id": "DR005", "location_id": "LOC002", "datetime": "2026-03-13T09:30:00", "type": "follow_up", "status": "scheduled", "notes": "Post-surgery check"}
+{"id": "A007", "patient_id": "P006", "provider_id": "DR001", "location_id": "LOC001", "datetime": "2026-03-10T16:00:00", "type": "consultation", "status": "no_show", "notes": "New patient intake - missed"}
+{"id": "A008", "patient_id": "P007", "provider_id": "DR003", "location_id": "LOC002", "datetime": "2026-03-14T10:00:00", "type": "checkup", "status": "scheduled", "notes": "Prenatal visit"}
+{"id": "A009", "patient_id": "P008", "provider_id": "DR002", "location_id": "LOC001", "datetime": "2026-03-09T11:00:00", "type": "procedure", "status": "completed", "notes": "Minor procedure completed successfully"}
+{"id": "A010", "patient_id": "P002", "provider_id": "DR002", "location_id": "LOC001", "datetime": "2026-03-18T14:00:00", "type": "consultation", "status": "scheduled", "notes": "Rescheduled from no-show"}

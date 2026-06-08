@@ -13,6 +13,6 @@ class MemoryService(MemoryBase):
             "limit": limit or 5,
             "filter": {
                 "ownerId": {"eq": sanitize_owner_id(owner_id)},
-                "namespace": {"eq": "reddash-demo"},
+                "namespace": {"eq": "banking-demo"},
             },
         }

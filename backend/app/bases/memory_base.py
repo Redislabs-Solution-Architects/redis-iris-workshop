@@ -30,7 +30,7 @@ def sanitize_owner_id(value: str | None) -> str:
 
 
 def sanitize_actor_id(value: str | None) -> str:
-    return _sanitize_id(value, fallback="reddash-agent")
+    return _sanitize_id(value, fallback="workshop-agent")
 
 
 def utc_now_iso() -> str:
@@ -113,7 +113,8 @@ class MemoryBase:
 
     def _search_filter(self, session_id: str | None = None) -> dict:
         owner_id = sanitize_owner_id(self.settings.memory_owner_id)
-        namespace = self.settings.memory_namespace.strip() or "reddash-demo"
+        domain = self.settings.demo_domain or "reddash"
+        namespace = self.settings.memory_namespace.strip() or f"{domain}-demo"
         filt: dict[str, Any] = {
             "ownerId": {"eq": owner_id},
             "namespace": {"eq": namespace},

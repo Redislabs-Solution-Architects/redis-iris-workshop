@@ -10,35 +10,59 @@ from backend.app.core.domain_contract import (
     BrandingConfig,
     DomainManifest,
     GeneratedDataset,
+    GuardrailConfig,
+    GuardrailRouteConfig,
     IdentityConfig,
     InternalToolDefinition,
     NamespaceConfig,
     PromptCard,
     RagConfig,
+    SeedLangCacheEntry,
+    SeedMemory,
     ThemeConfig,
 )
 from backend.app.core.domain_schema import EntitySpec
 from backend.app.redis_connection import create_redis_client
-from domains.reddash.data_generator import generate_demo_data
-from domains.reddash.prompt import build_system_prompt
-from domains.reddash.schema import ENTITY_SPECS
 
 ROOT = Path(__file__).resolve().parents[2]
 
 
+def _load_local_module(module_name: str, file_name: str):
+    import importlib.util
+
+    module_path = Path(__file__).resolve().parent / file_name
+    spec = importlib.util.spec_from_file_location(
+        f"digital_native_{module_name}", module_path
+    )
+    if spec is None or spec.loader is None:
+        raise ImportError(f"Unable to load digital-native module from {module_path}")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+_data_generator = _load_local_module("data_generator", "data_generator.py")
+_prompt = _load_local_module("prompt", "prompt.py")
+_schema = _load_local_module("schema", "schema.py")
+
+generate_demo_data = _data_generator.generate_demo_data
+build_system_prompt = _prompt.build_system_prompt
+ENTITY_SPECS = _schema.ENTITY_SPECS
+
+
 class ReddashDomain:
     manifest = DomainManifest(
-        id="reddash",
+        id="digital-native",
         description="Food-delivery support demo comparing Context Surfaces vs simple RAG.",
-        generated_models_module="domains.reddash.generated_models",
-        generated_models_path="domains/reddash/generated_models.py",
-        output_dir="output/reddash",
+        generated_models_module="domains.digital_native.generated_models",
+        generated_models_path="domains/digital-native/generated_models.py",
+        output_dir="output/digital-native",
         branding=BrandingConfig(
             app_name="Reddash",
             subtitle="Delivery Support",
             hero_title="How can we help?",
             placeholder_text="Ask about your order, delivery status, or policies...",
-            logo_path="domains/reddash/assets/logo.svg",
+            logo_path="domains/digital-native/assets/logo.svg",
             demo_steps=[
                 "Why is my order running late?",
                 "Please remember that I prefer takeout and spicy food for future orders.",
@@ -66,13 +90,14 @@ class ReddashDomain:
                 soft="#d4cfc8",
                 accent="#ff4438",
                 user="#2a2420",
+                landing_bg="#FFF3D9",
             ),
         ),
         namespace=NamespaceConfig(
-            redis_prefix="reddash",
-            dataset_meta_key="reddash:meta:dataset",
-            checkpoint_prefix="reddash:checkpoint",
-            checkpoint_write_prefix="reddash:checkpoint_write",
+            redis_prefix="digital-native",
+            dataset_meta_key="digital-native:meta:dataset",
+            checkpoint_prefix="digital-native:checkpoint",
+            checkpoint_write_prefix="digital-native:checkpoint_write",
             redis_instance_name="Reddash Redis Cloud",
             surface_name="Reddash Delivery Surface",
             agent_name="Reddash Delivery Agent",
@@ -100,6 +125,76 @@ class ReddashDomain:
                 "Call this whenever the user asks about their orders, account, or history."
             ),
         ),
+        guardrail=GuardrailConfig(
+            router_name="digital-native-guardrails",
+            allowed_route_name="allow_list",
+            routes=[
+                GuardrailRouteConfig(
+                    name="allow_list",
+                    references=[
+                        "Where is my order?",
+                        "I want a refund",
+                        "My food was cold when it arrived",
+                        "What restaurants are nearby?",
+                        "What should I order?",
+                        "What's the status of my delivery?",
+                        "Can you help me?",
+                        "What do you know about me?",
+                        "My order is late",
+                        "What's your refund policy?",
+                        "Hello",
+                        "Yes",
+                        "No",
+                        "Yes please",
+                        "No thanks",
+                        "Tell me more",
+                        "Go ahead",
+                        "That sounds good",
+                        "Sure",
+                        "Thanks",
+                        "Thank you",
+                    ],
+                    distance_threshold=0.7,
+                ),
+                GuardrailRouteConfig(
+                    name="deny_list",
+                    references=[
+                        "Help me write code for a delivery tracker",
+                        "Write me a Python script",
+                        "Tell me a joke",
+                        "What's the weather like today?",
+                        "Help me with my homework",
+                        "Who won the Super Bowl?",
+                        "Explain quantum physics",
+                        "How do I fix my car?",
+                    ],
+                    distance_threshold=0.5,
+                ),
+            ],
+        ),
+        seed_memories=[
+            SeedMemory(
+                text="Alex prefers takeout instead of delivery.",
+                topics=["delivery", "preferences"],
+            ),
+            SeedMemory(
+                text="Likes spicy food",
+                topics=["food", "preferences"],
+            ),
+        ],
+        seed_langcache=[
+            SeedLangCacheEntry(
+                prompt="What's your refund policy for late deliveries?",
+                response=(
+                    "If your order is delivered more than **15 minutes late**, you get a "
+                    "**20% credit** on your next order. If it's over **30 minutes late**, you can "
+                    "request a **refund of the delivery fee**; if it's over **45 minutes late**, "
+                    "you may qualify for a **full order refund**. Please contact support with your "
+                    "order details to start the process."
+                ),
+                attributes={"domain": "digital-native"},
+            ),
+        ],
     )
 
     def get_entity_specs(self) -> tuple[EntitySpec, ...]:
