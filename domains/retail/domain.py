@@ -325,14 +325,14 @@ class ElectrohubDomain:
         if tool_name == self.manifest.identity.tool_name:
             identity = self.manifest.identity
             return {
-                identity.id_field: os.getenv(identity.id_env_var, identity.default_id),
-                "name": os.getenv(identity.name_env_var, identity.default_name),
-                "email": os.getenv(identity.email_env_var, identity.default_email),
-                "member_tier": os.getenv("DEMO_USER_MEMBER_TIER", DEMO_CUSTOMER["member_tier"]),
-                "city": os.getenv("DEMO_USER_CITY", DEMO_CUSTOMER["city"]),
-                "state": os.getenv("DEMO_USER_STATE", DEMO_CUSTOMER["state"]),
-                "home_store_id": os.getenv("DEMO_USER_HOME_STORE_ID", DEMO_CUSTOMER["home_store_id"]),
-                "home_store_name": os.getenv("DEMO_USER_HOME_STORE_NAME", DEMO_CUSTOMER["home_store_name"]),
+                identity.id_field: os.getenv(identity.id_env_var) or identity.default_id,
+                "name": os.getenv(identity.name_env_var) or identity.default_name,
+                "email": os.getenv(identity.email_env_var) or identity.default_email,
+                "member_tier": os.getenv("DEMO_USER_MEMBER_TIER") or DEMO_CUSTOMER["member_tier"],
+                "city": os.getenv("DEMO_USER_CITY") or DEMO_CUSTOMER["city"],
+                "state": os.getenv("DEMO_USER_STATE") or DEMO_CUSTOMER["state"],
+                "home_store_id": os.getenv("DEMO_USER_HOME_STORE_ID") or DEMO_CUSTOMER["home_store_id"],
+                "home_store_name": os.getenv("DEMO_USER_HOME_STORE_NAME") or DEMO_CUSTOMER["home_store_name"],
             }
         if tool_name == "get_current_time":
             return {
@@ -353,7 +353,7 @@ class ElectrohubDomain:
             return self.execute_internal_tool(tool_name, arguments, settings)
 
         identity = self.manifest.identity
-        owner_id = os.getenv(identity.id_env_var, identity.default_id)
+        owner_id = os.getenv(identity.id_env_var) or identity.default_id
         memory_service = MemoryService(settings)
         if not memory_service.is_configured():
             return {"error": "Memory service is not configured for this demo."}

@@ -23,182 +23,167 @@ from backend.app.core.domain_contract import (
 from backend.app.core.domain_schema import EntitySpec
 from backend.app.redis_connection import create_redis_client
 from backend.app.services.memory_service import MemoryService
-from domains.banking.data_generator import DEMO_CUSTOMER_ID, generate_demo_data
-from domains.banking.prompt import build_system_prompt
-from domains.banking.schema import ENTITY_SPECS
+from domains.telco.data_generator import generate_demo_data
+from domains.telco.prompt import build_system_prompt
+from domains.telco.schema import ENTITY_SPECS
 
 ROOT = Path(__file__).resolve().parents[2]
 
 
-class RadishBankDomain:
+class RMobileDomain:
     manifest = DomainManifest(
-        id="banking",
-        description="Radish Bank retail demo: structured accounts plus policy docs.",
-        generated_models_module="domains.banking.generated_models",
-        generated_models_path="domains/banking/generated_models.py",
-        output_dir="output/banking",
+        id="telco",
+        description="Wireless carrier account-support demo for R-Mobile, modeled after T-Mobile / AT&T / Verizon.",
+        generated_models_module="domains.telco.generated_models",
+        generated_models_path="domains/telco/generated_models.py",
+        output_dir="output/telco",
         branding=BrandingConfig(
-            app_name="Radish Bank",
-            subtitle="Customer Care",
-            hero_title="Banking Made Easy",
-            placeholder_text="Ask about accounts, cards, FDs, insurance, branches, or fee waivers…",
-            logo_path="domains/banking/assets/logo.svg",
+            app_name="R-Mobile",
+            subtitle="Account Support",
+            hero_title="How can we help you today?",
+            placeholder_text="Ask about your bill, plans, devices, or coverage...",
+            logo_path="domains/telco/assets/logo.svg",
             demo_steps=[
-                "What are my current account balances?",
-                "Please remember that I prefer paperless statements and am interested in fixed deposits.",
+                "Why is my bill higher than last month?",
+                "I always want paperless billing and autopay on",
                 "Click Memory",
-                "Given what you know about my preferences, what banking products would you recommend for me?",
+                "What add-ons or plans would you recommend for me?",
             ],
             starter_prompts=[
-                PromptCard(
-                    eyebrow="Context",
-                    title="What are my account balances?",
-                    prompt="What accounts do I have and what are my current balances?",
-                ),
-                PromptCard(
-                    eyebrow="Context",
-                    title="Recent service requests",
-                    prompt="Show me my recent service requests",
-                ),
-                PromptCard(
-                    eyebrow="Memory",
-                    title="Save banking preferences",
-                    prompt="Please remember that I prefer mobile banking and contactless payments",
-                ),
-                PromptCard(
-                    eyebrow="Memory",
-                    title="Product recommendations",
-                    prompt="What are my banking preferences and savings interests?",
-                ),
-                PromptCard(
-                    eyebrow="Cached",
-                    title="Fixed deposit rates",
-                    prompt="What are your current fixed deposit interest rates?",
-                ),
+                PromptCard(eyebrow="Context", title="Why is my bill so high?", prompt="Why is my bill higher than last month?"),
+                PromptCard(eyebrow="Context", title="Device upgrade eligibility", prompt="Am I eligible to upgrade my phone?"),
+                PromptCard(eyebrow="Memory", title="Save preferences", prompt="I always want paperless billing and autopay on"),
+                PromptCard(eyebrow="Memory", title="Recommendations for me", prompt="What add-ons or plans would you recommend for me?"),
+                PromptCard(eyebrow="Cached", title="Trade-in policy", prompt="What is your device trade-in policy?"),
             ],
             theme=ThemeConfig(
-                bg="#071a14",
-                bg_accent_a="rgba(46, 204, 113, 0.12)",
-                bg_accent_b="rgba(241, 196, 15, 0.08)",
-                panel="rgba(12, 32, 26, 0.92)",
-                panel_strong="rgba(14, 40, 32, 0.97)",
-                panel_elevated="rgba(18, 48, 38, 0.95)",
-                line="rgba(46, 204, 113, 0.15)",
-                line_strong="rgba(241, 196, 15, 0.2)",
-                text="#ecf7f2",
-                muted="#8fb3a8",
-                soft="#cfe8dc",
-                accent="#2ecc71",
-                user="#0d1f18",
-                landing_bg="#F4F7F5",
+                bg="#0d0a12",
+                bg_accent_a="rgba(226, 0, 116, 0.12)",
+                bg_accent_b="rgba(180, 0, 90, 0.08)",
+                panel="rgba(18, 14, 24, 0.90)",
+                panel_strong="rgba(22, 16, 32, 0.96)",
+                panel_elevated="rgba(28, 20, 40, 0.92)",
+                line="rgba(226, 0, 116, 0.10)",
+                line_strong="rgba(226, 0, 116, 0.20)",
+                text="#f2eef5",
+                muted="#9a8fa3",
+                soft="#d4ccdb",
+                accent="#e20074",
+                user="#1e1428",
+                landing_bg="#F5F5F5",
             ),
         ),
         namespace=NamespaceConfig(
-            redis_prefix="banking",
-            dataset_meta_key="banking:meta:dataset",
-            checkpoint_prefix="banking:checkpoint",
-            checkpoint_write_prefix="banking:checkpoint_write",
-            redis_instance_name="Radish Bank Redis Cloud",
-            surface_name="Radish Bank Context Surface",
-            agent_name="Radish Bank Service Agent",
+            redis_prefix="telco",
+            dataset_meta_key="telco:meta:dataset",
+            checkpoint_prefix="telco:checkpoint",
+            checkpoint_write_prefix="telco:checkpoint_write",
+            redis_instance_name="R-Mobile Redis Cloud",
+            surface_name="R-Mobile Account Surface",
+            agent_name="R-Mobile Support Agent",
         ),
         rag=RagConfig(
-            tool_name="vector_search_bank_documents",
-            status_text="Searching Radish Bank policy documents…",
-            generating_text="Generating answer…",
-            index_name_contains="bankdocument",
+            tool_name="vector_search_policy_docs",
+            status_text="Searching R-Mobile policy documents…",
+            generating_text="Generating answer from policies…",
+            index_name_contains="policydoc",
             vector_field="content_embedding",
-            return_fields=["title", "category", "content", "document_id"],
-            num_results=4,
+            return_fields=["title", "category", "content", "doc_id"],
+            num_results=3,
             answer_system_prompt=(
-                "You are Radish Bank's policy and product-information assistant. "
-                "Answer using only the retrieved bank documents. If they do not cover the question, say so briefly."
+                "You are R-Mobile's policy and account-support assistant. "
+                "Answer using only the retrieved policy documents. If they do not cover "
+                "the question, say so briefly. Be concise and helpful."
             ),
         ),
         identity=IdentityConfig(
-            default_id=DEMO_CUSTOMER_ID,
-            default_name="Merv Kwok",
-            default_email="merv.kwok@example.com",
             id_field="customer_id",
+            default_id="CUST_DEMO_001",
+            default_name="Jamie Torres",
+            default_email="jamie.torres@example.com",
             description=(
-                "Returns the signed-in retail customer id, name, and email. "
-                "The customer_id is always the full string CUST001 in this demo—copy it exactly into any "
-                "filter_*_by_customer_id or similar MCP tool (never shorten to C001). Call before account, card, or balance lookups."
+                "Returns the signed-in customer's ID, name, and email. "
+                "Call this whenever the user asks about their account, bills, lines, or devices."
             ),
         ),
         guardrail=GuardrailConfig(
-            router_name="banking-guardrails",
-            allowed_route_name="banking",
+            router_name="telco-guardrails",
+            allowed_route_name="wireless_support",
             routes=[
                 GuardrailRouteConfig(
-                    name="banking",
+                    name="wireless_support",
                     references=[
-                        "Check my savings balance",
-                        "What are my account balances?",
-                        "Fixed deposit rate FD6",
-                        "Waive annual card fee",
-                        "Branch hours Tampines",
-                        "Auto lobby and branch services",
-                        "Accident insurance premium",
-                        "Transfer between my accounts",
-                        "Hello I need help with my account",
-                        "What accounts do I have?",
-                        "Early withdrawal penalty fixed deposit",
-                        "What FD products are available?",
-                        "What is the interest rate?",
-                        "I want to invest in a fixed deposit",
-                        "How do I open a new account?",
-                        "What are the card fee charges?",
-                        "Show me my service request history",
-                        "Is Bishan a full branch?",
-                        "What insurance plans do you offer?",
-                        "Place 2000 SGD in the 6-month FD",
+                        "Why is my bill so high this month?",
+                        "What's this charge on my bill?",
+                        "Set up autopay",
+                        "I need a payment extension",
+                        "I want to dispute a charge",
+                        "How do I upgrade my phone?",
+                        "I want to trade in my phone",
+                        "Do I have device insurance?",
+                        "How do I unlock my phone?",
+                        "What plans do you offer?",
+                        "I want to change my plan",
+                        "I want to add someone to my plan",
+                        "How much data have I used?",
+                        "Do you have international plans?",
+                        "How much is roaming in Mexico?",
+                        "I have no signal at home",
+                        "Is there an outage in my area?",
+                        "My calls keep dropping",
+                        "Update my billing address",
+                        "I want to cancel my service",
+                        "Remember that I travel internationally often",
+                        "What do you know about my preferences?",
                         "Yes",
-                        "No",
+                        "No thanks",
                         "Sure",
                         "Thanks",
                         "Hello",
-                        "Can you help me?",
+                        "OK",
                     ],
                     distance_threshold=0.7,
                 ),
                 GuardrailRouteConfig(
                     name="off_topic",
                     references=[
-                        "Why is the sky blue?",
-                        "Who is the current US president?",
-                        "Recipe for chocolate cake",
-                        "Capital of Mongolia",
-                        "Write me a Python sorting algorithm",
-                        "What is the weather tomorrow?",
+                        "What's the weather like today?",
+                        "Write me a Python script",
+                        "Help me with my homework",
                         "Tell me a joke",
-                        "History of the Roman Empire",
+                        "Who won the Super Bowl?",
+                        "Explain quantum physics",
                         "Write a poem about love",
-                        "What's the latest news?",
+                        "Who is the president?",
                         "Translate this to Spanish",
                         "Help me debug my code",
                         "What's the meaning of life?",
-                        "Play a game with me",
-                        "What's the stock market doing?",
+                        "Can you help me fix my WiFi router?",
+                        "Compare T-Mobile vs Verizon for me",
+                        "What phone should I buy from Best Buy?",
                     ],
                     distance_threshold=0.5,
                 ),
             ],
         ),
         seed_memories=[
-            SeedMemory(text="Prefers paperless statements and is interested in fixed deposits", topics=["banking", "preferences"]),
+            SeedMemory(text="Travels to Canada frequently for work", topics=["international", "travel"]),
+            SeedMemory(text="Prefers to manage everything through the app", topics=["account", "preferences"]),
         ],
         seed_langcache=[
             SeedLangCacheEntry(
-                prompt="What are your current fixed deposit interest rates?",
+                prompt="What is your device trade-in policy?",
                 response=(
-                    "We currently offer two fixed deposit plans:\n\n"
-                    "- **FD6** (6-month term): **2.8% p.a.** — minimum deposit SGD 1,000\n"
-                    "- **FD12** (12-month term): **3.1% p.a.** — minimum deposit SGD 1,000\n\n"
-                    "Interest is calculated daily and paid at maturity. Early withdrawal forfeits all accrued interest. "
-                    "You can open an FD through your account portal or visit any Radish Bank branch."
+                    "Our trade-in program lets you trade in your current device toward a new one. "
+                    "Here's how it works:\n\n"
+                    "- **Eligible devices** are assessed based on condition — screen, buttons, and power must all be functional\n"
+                    "- **Trade-in value** is applied as **monthly bill credits over 24 months**, not a one-time discount\n"
+                    "- **If you cancel** your line before 24 months, the remaining credits are forfeited\n"
+                    "- **Mail-in or in-store**: You have 30 days after activation to return your trade-in device\n\n"
+                    "For example, a recent iPhone in good condition can qualify for up to **$800 in credits** "
+                    "toward a new device. Want me to check what your current device is worth?"
                 ),
-                attributes={"domain": "banking"},
+                attributes={"domain": "telco"},
             ),
         ],
     )
@@ -226,8 +211,9 @@ class RadishBankDomain:
     def build_answer_verifier_prompt(self, *, runtime_config: dict[str, Any] | None = None) -> str:
         del runtime_config
         return (
-            "When the user refers to 'my savings', 'that waiver', or 'the Bishan branch', tie the answer to the "
-            "exact account id, request id, or branch id from tool results. Do not invent rates or fees."
+            "When the user refers to 'that charge', 'that line', 'my bill', or similar follow-ups, resolve the reference to the exact "
+            "bill, charge, line, or device from the prior turn. Do not mention credits, refunds, or policy outcomes unless the "
+            "tool results or cited policy support them."
         )
 
     def describe_tool_trace_step(
@@ -237,11 +223,33 @@ class RadishBankDomain:
         payload: Any,
         runtime_config: dict[str, Any] | None = None,
     ) -> str | None:
-        del payload, runtime_config
+        del runtime_config
+        detail = ""
+        if isinstance(payload, dict):
+            for key in ("query", "text", "customer_id", "bill_id", "line_id", "device_id", "ticket_id"):
+                value = payload.get(key)
+                if value:
+                    detail = str(value)
+                    break
+
         if tool_name == self.manifest.identity.tool_name:
-            return "Identify the signed-in Radish Bank customer before account or card lookups."
+            return "Identify the signed-in customer before checking account data."
         if tool_name == "get_current_time":
-            return "Compare the current time against service-request timestamps."
+            return "Compare the current time against bill due dates and device eligibility."
+        if tool_name.startswith("search_policydoc"):
+            return f"Search R-Mobile policy guidance: {detail or 'policy search'}."
+        if tool_name.startswith("filter_bill"):
+            return "Look up billing history and charges for the account."
+        if tool_name.startswith("filter_billcharge"):
+            return "Inspect the line-item charges on a bill."
+        if tool_name.startswith("filter_line"):
+            return "Check the phone lines, plans, and usage on the account."
+        if tool_name.startswith("filter_device"):
+            return "Check device details, installment balances, and upgrade eligibility."
+        if tool_name.startswith("filter_supportticket"):
+            return "Review past support tickets for the account."
+        if tool_name.startswith("search_plan") or tool_name.startswith("filter_plan"):
+            return "Look up available wireless plans."
         if tool_name == "search_customer_memory":
             return "Search durable customer memory for preferences, past issues, or stored context."
         if tool_name == "remember_customer_detail":
@@ -260,11 +268,14 @@ class RadishBankDomain:
             ),
             InternalToolDefinition(
                 name="get_current_time",
-                description="Current UTC time (ISO) for comparing service-request timestamps.",
+                description=(
+                    "Returns the current date and time in UTC (ISO 8601). "
+                    "Use this to compare against bill due dates, device upgrade eligibility, and ticket timestamps."
+                ),
             ),
             InternalToolDefinition(
                 name="dataset_overview",
-                description="Counts of Radish Bank demo entities loaded for this surface.",
+                description="Returns a summary of the current R-Mobile dataset: counts of customers, lines, plans, devices, bills, and policies.",
             ),
         ]
         if (runtime_config or {}).get("memory_enabled"):
@@ -303,7 +314,7 @@ class RadishBankDomain:
                                 "topics": {
                                     "type": "array",
                                     "items": {"type": "string"},
-                                    "description": "Optional topic tags like banking, preferences, products, insurance.",
+                                    "description": "Optional topic tags like billing, plans, devices, international.",
                                 },
                             },
                             "required": ["text"],
@@ -318,11 +329,8 @@ class RadishBankDomain:
 
         if tool_name == self.manifest.identity.tool_name:
             identity = self.manifest.identity
-            raw_id = (os.getenv(identity.id_env_var) or identity.default_id).strip()
-            # Demo seed + indexes use CUST001; tolerate common .env typo "C001".
-            customer_id = DEMO_CUSTOMER_ID if raw_id.casefold() == "c001" else raw_id
             return {
-                identity.id_field: customer_id,
+                identity.id_field: os.getenv(identity.id_env_var) or identity.default_id,
                 "name": os.getenv(identity.name_env_var) or identity.default_name,
                 "email": os.getenv(identity.email_env_var) or identity.default_email,
             }
@@ -395,15 +403,13 @@ class RadishBankDomain:
     def write_dataset_meta(self, *, settings: Any, records: dict[str, list[dict[str, Any]]]) -> dict[str, Any]:
         summary = {
             "customers": len(records.get("Customer", [])),
-            "accounts": len(records.get("Account", [])),
-            "cards": len(records.get("Card", [])),
-            "fixed_deposit_plans": len(records.get("FixedDepositPlan", [])),
-            "insurance_plans": len(records.get("InsurancePlan", [])),
-            "branches": len(records.get("Branch", [])),
-            "branch_hours": len(records.get("BranchHours", [])),
-            "product_holdings": len(records.get("ProductHolding", [])),
-            "service_requests": len(records.get("ServiceRequest", [])),
-            "bank_documents": len(records.get("BankDocument", [])),
+            "lines": len(records.get("Line", [])),
+            "plans": len(records.get("Plan", [])),
+            "devices": len(records.get("Device", [])),
+            "bills": len(records.get("Bill", [])),
+            "bill_charges": len(records.get("BillCharge", [])),
+            "support_tickets": len(records.get("SupportTicket", [])),
+            "policy_docs": len(records.get("PolicyDoc", [])),
         }
         client = create_redis_client(settings)
         client.delete(self.manifest.namespace.dataset_meta_key)
@@ -442,4 +448,4 @@ class RadishBankDomain:
         return errors
 
 
-DOMAIN = RadishBankDomain()
+DOMAIN = RMobileDomain()

@@ -1,0 +1,23 @@
+{"charge_id": "CHG_001", "bill_id": "BILL_001", "line_id": "LINE_001", "category": "plan", "description": "Go5G Plus — Jamie's iPhone", "amount": 45.0, "is_recurring": "true"}
+{"charge_id": "CHG_002", "bill_id": "BILL_001", "line_id": "LINE_002", "category": "plan", "description": "Go5G Plus — Riley's iPhone", "amount": 45.0, "is_recurring": "true"}
+{"charge_id": "CHG_003", "bill_id": "BILL_001", "line_id": "LINE_003", "category": "plan", "description": "Go5G Plus — Pat's Galaxy", "amount": 45.0, "is_recurring": "true"}
+{"charge_id": "CHG_004", "bill_id": "BILL_001", "line_id": null, "category": "credit", "description": "Autopay & paperless discount (3 lines)", "amount": -25.0, "is_recurring": "true"}
+{"charge_id": "CHG_005", "bill_id": "BILL_001", "line_id": "LINE_001", "category": "device_installment", "description": "iPhone 16 Pro installment (23 of 24)", "amount": 3.47, "is_recurring": "true"}
+{"charge_id": "CHG_006", "bill_id": "BILL_001", "line_id": "LINE_002", "category": "device_installment", "description": "iPhone 15 installment (6 of 24)", "amount": 24.99, "is_recurring": "true"}
+{"charge_id": "CHG_007", "bill_id": "BILL_001", "line_id": "LINE_001", "category": "credit", "description": "Device trade-in credit (iPhone 14 Pro)", "amount": -16.67, "is_recurring": "true"}
+{"charge_id": "CHG_008", "bill_id": "BILL_001", "line_id": "LINE_001", "category": "insurance", "description": "Protection 360 — Jamie's iPhone", "amount": 18.0, "is_recurring": "true"}
+{"charge_id": "CHG_009", "bill_id": "BILL_001", "line_id": null, "category": "taxes_fees", "description": "Regulatory recovery fee", "amount": 3.49, "is_recurring": "true"}
+{"charge_id": "CHG_010", "bill_id": "BILL_001", "line_id": null, "category": "taxes_fees", "description": "Federal Universal Service Fund", "amount": 2.89, "is_recurring": "true"}
+{"charge_id": "CHG_011", "bill_id": "BILL_001", "line_id": null, "category": "taxes_fees", "description": "State and local taxes (CO)", "amount": 5.26, "is_recurring": "true"}
+{"charge_id": "CHG_012", "bill_id": "BILL_001", "line_id": null, "category": "taxes_fees", "description": "911 surcharge", "amount": 1.99, "is_recurring": "true"}
+{"charge_id": "CHG_013", "bill_id": "BILL_001", "line_id": "LINE_001", "category": "international", "description": "International roaming — data usage in Canada (0.4 GB)", "amount": 29.0, "is_recurring": "false"}
+{"charge_id": "CHG_014", "bill_id": "BILL_001", "line_id": "LINE_001", "category": "one_time", "description": "Device Protection 360 claim deductible — screen repair", "amount": 5.0, "is_recurring": "false"}
+{"charge_id": "CHG_015", "bill_id": "BILL_002", "line_id": "LINE_001", "category": "plan", "description": "Go5G Plus — Jamie's iPhone", "amount": 45.0, "is_recurring": "true"}
+{"charge_id": "CHG_016", "bill_id": "BILL_002", "line_id": "LINE_002", "category": "plan", "description": "Go5G Plus — Riley's iPhone", "amount": 45.0, "is_recurring": "true"}
+{"charge_id": "CHG_017", "bill_id": "BILL_002", "line_id": "LINE_003", "category": "plan", "description": "Go5G Plus — Pat's Galaxy", "amount": 45.0, "is_recurring": "true"}
+{"charge_id": "CHG_018", "bill_id": "BILL_002", "line_id": null, "category": "credit", "description": "Autopay & paperless discount (3 lines)", "amount": -25.0, "is_recurring": "true"}
+{"charge_id": "CHG_019", "bill_id": "BILL_002", "line_id": "LINE_001", "category": "device_installment", "description": "iPhone 16 Pro installment (22 of 24)", "amount": 3.47, "is_recurring": "true"}
+{"charge_id": "CHG_020", "bill_id": "BILL_002", "line_id": "LINE_002", "category": "device_installment", "description": "iPhone 15 installment (5 of 24)", "amount": 24.99, "is_recurring": "true"}
+{"charge_id": "CHG_021", "bill_id": "BILL_002", "line_id": "LINE_001", "category": "credit", "description": "Device trade-in credit (iPhone 14 Pro)", "amount": -16.67, "is_recurring": "true"}
+{"charge_id": "CHG_022", "bill_id": "BILL_002", "line_id": "LINE_001", "category": "insurance", "description": "Protection 360 — Jamie's iPhone", "amount": 18.0, "is_recurring": "true"}
+{"charge_id": "CHG_023", "bill_id": "BILL_002", "line_id": null, "category": "taxes_fees", "description": "Taxes, fees & surcharges", "amount": 13.43, "is_recurring": "true"}

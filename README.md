@@ -17,6 +17,7 @@ A hands on workshop where you pick an industry vertical and build an AI support 
 | Retail | Electronics shopping concierge | `retail` |
 | Finance | Stock research analyst | `finance` |
 | Banking | Customer care agent | `banking` |
+| Telco | Wireless account support | `telco` |
 
 ## Quick Start
 

@@ -351,7 +351,7 @@ class ReddashDomain:
             return self.execute_internal_tool(tool_name, arguments, settings)
 
         identity = self.manifest.identity
-        owner_id = os.getenv(identity.id_env_var, identity.default_id)
+        owner_id = os.getenv(identity.id_env_var) or identity.default_id
         memory_service = MemoryService(settings)
         if not memory_service.is_configured():
             return {"error": "Memory service is not configured for this demo."}
