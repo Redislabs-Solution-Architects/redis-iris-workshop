@@ -126,10 +126,10 @@ class FinanceResearcherDomain:
         ),
         guardrail=GuardrailConfig(
             router_name="shiftiq-guardrails",
-            allowed_route_name="financial_research",
+            allowed_route_name="allow_list",
             routes=[
                 GuardrailRouteConfig(
-                    name="financial_research",
+                    name="allow_list",
                     references=[
                         "Compare the latest NVIDIA and AMD filings",
                         "What changed in Broadcom's earnings this quarter?",
@@ -163,7 +163,7 @@ class FinanceResearcherDomain:
                     distance_threshold=0.7,
                 ),
                 GuardrailRouteConfig(
-                    name="off_topic",
+                    name="deny_list",
                     references=[
                         "What's the weather like today?",
                         "Tell me a joke",

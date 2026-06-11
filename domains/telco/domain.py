@@ -108,10 +108,10 @@ class RMobileDomain:
         ),
         guardrail=GuardrailConfig(
             router_name="telco-guardrails",
-            allowed_route_name="wireless_support",
+            allowed_route_name="allow_list",
             routes=[
                 GuardrailRouteConfig(
-                    name="wireless_support",
+                    name="allow_list",
                     references=[
                         "Why is my bill so high this month?",
                         "What's this charge on my bill?",
@@ -145,7 +145,7 @@ class RMobileDomain:
                     distance_threshold=0.7,
                 ),
                 GuardrailRouteConfig(
-                    name="off_topic",
+                    name="deny_list",
                     references=[
                         "What's the weather like today?",
                         "Write me a Python script",

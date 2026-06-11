@@ -78,6 +78,7 @@ export type DomainConfig = {
   starter_prompts: PromptCard[];
   theme: Record<string, string>;
   logo_src: string;
+  seed_langcache: { prompt: string; response: string }[];
 } | null;
 
 export type ToolDefinition = {

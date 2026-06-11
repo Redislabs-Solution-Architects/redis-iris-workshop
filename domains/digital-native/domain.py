@@ -65,7 +65,7 @@ class ReddashDomain:
             logo_path="domains/digital-native/assets/logo.svg",
             demo_steps=[
                 "Why is my order running late?",
-                "Please remember that I prefer takeout and spicy food for future orders.",
+                "Please remember that I prefer contactless delivery and spicy food for future orders.",
                 "Click Memory",
                 "Given what you know about me, look at my recent orders and tell me what I should reorder tonight and how it should be delivered.",
             ],
@@ -174,7 +174,7 @@ class ReddashDomain:
         ),
         seed_memories=[
             SeedMemory(
-                text="Alex prefers takeout instead of delivery.",
+                text="Prefers contactless delivery",
                 topics=["delivery", "preferences"],
             ),
             SeedMemory(
@@ -186,11 +186,13 @@ class ReddashDomain:
             SeedLangCacheEntry(
                 prompt="What's your refund policy for late deliveries?",
                 response=(
-                    "If your order is delivered more than **15 minutes late**, you get a "
-                    "**20% credit** on your next order. If it's over **30 minutes late**, you can "
-                    "request a **refund of the delivery fee**; if it's over **45 minutes late**, "
-                    "you may qualify for a **full order refund**. Please contact support with your "
-                    "order details to start the process."
+                    "Our refund policy for late deliveries is based on how late the order arrives:\n\n"
+                    "- **15+ minutes late**: 20% credit on your next order\n"
+                    "- **30+ minutes late**: Full delivery fee refund\n"
+                    "- **45+ minutes late**: Full order refund\n\n"
+                    "Credits are applied automatically to your account within 24 hours. "
+                    "If you believe your order qualifies, please share your order number "
+                    "and we'll look into it right away."
                 ),
                 attributes={},
             ),

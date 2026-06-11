@@ -144,6 +144,13 @@ button { cursor: pointer; border: none; background: none; }
 .topbar-brand {
   display: flex;
   align-items: center;
+  gap: 10px;
+}
+
+.topbar-brand-logo {
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
 }
 
 .brand-text {

@@ -2,6 +2,7 @@ import { useState } from "react";
 import type {
   AgentMode,
   ChatMessage,
+  DomainConfig,
   MemoryDashboardState,
   RedisContextView,
   ToolDefinition,
@@ -29,6 +30,7 @@ type ActivityPanelProps = {
   toolsData: ToolDefinition[];
   toolsLoading: boolean;
   mode: AgentMode;
+  domain: DomainConfig;
 };
 
 function ChevronIcon({ open, className }: { open: boolean; className?: string }) {
@@ -298,12 +300,6 @@ function ActivityView({ allMessages, mode }: { allMessages: ChatMessage[]; mode:
 }
 
 
-const CACHED_ENTRIES = [
-  {
-    question: "What's your refund policy for late deliveries?",
-    snippet: "If your order arrives more than 15 minutes late, you're eligible for a 20% credit...",
-  },
-];
 
 
 /* ─── Expandable card used in conversation All Context ─── */
@@ -388,6 +384,7 @@ function RedisContextContent({
   toolsData,
   toolsLoading,
   mode,
+  domain,
 }: {
   memoryData: MemoryDashboardState;
   memoryLoading: boolean;
@@ -395,6 +392,7 @@ function RedisContextContent({
   toolsData: ToolDefinition[];
   toolsLoading: boolean;
   mode: AgentMode;
+  domain: DomainConfig;
 }) {
   const mcpTools = toolsData.filter((t) => t.kind === "mcp_tool");
   const entityCount = new Set(mcpTools.map((t) => extractEntity(t.name))).size;
@@ -408,6 +406,7 @@ function RedisContextContent({
   }
   const entityGroups = [...grouped.entries()].sort(([a], [b]) => a.localeCompare(b));
 
+  const cachedEntries = domain?.seed_langcache ?? [];
   const longTermCount = memoryData?.long_term?.length ?? 0;
   const shortTermCount = memoryData?.short_term?.length ?? 0;
 
@@ -419,23 +418,25 @@ function RedisContextContent({
         summary={
           <>
             <div className="overview-stat">
-              <span className="overview-stat-value overview-stat-value--sm">{CACHED_ENTRIES.length}</span>
-              <span className="overview-stat-label">cached response{CACHED_ENTRIES.length !== 1 ? "s" : ""}</span>
+              <span className="overview-stat-value overview-stat-value--sm">{cachedEntries.length}</span>
+              <span className="overview-stat-label">cached response{cachedEntries.length !== 1 ? "s" : ""}</span>
             </div>
-            <div className="overview-preview">
-              {CACHED_ENTRIES.map((e, i) => (
-                <div key={i} className="overview-preview-item">
-                  {e.question}
-                  <span className="cache-origin">
-                    <svg width="10" height="10" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                      <circle cx="8" cy="8" r="6.5" />
-                      <path d="M8 4.5V8L10.5 9.5" />
-                    </svg>
-                    Asked 8 hours ago in Austin, TX
-                  </span>
-                </div>
-              ))}
-            </div>
+            {cachedEntries.length > 0 && (
+              <div className="overview-preview">
+                {cachedEntries.map((e, i) => (
+                  <div key={i} className="overview-preview-item">
+                    {e.prompt}
+                    <span className="cache-origin">
+                      <svg width="10" height="10" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                        <circle cx="8" cy="8" r="6.5" />
+                        <path d="M8 4.5V8L10.5 9.5" />
+                      </svg>
+                      Asked 8 hours ago in Austin, TX
+                    </span>
+                  </div>
+                ))}
+              </div>
+            )}
           </>
         }
       />
@@ -579,6 +580,7 @@ export function ActivityPanel({
   toolsData,
   toolsLoading,
   mode,
+  domain,
 }: ActivityPanelProps) {
   const hasMessages = allMessages.length > 0;
   const isRag = mode === "simple_rag";
@@ -640,6 +642,7 @@ export function ActivityPanel({
             toolsData={toolsData}
             toolsLoading={toolsLoading}
             mode={mode}
+            domain={domain}
           />
         ) : isRag ? (
           <ActivityView allMessages={allMessages} mode={mode} />
@@ -656,6 +659,7 @@ export function ActivityPanel({
                 toolsData={toolsData}
                 toolsLoading={toolsLoading}
                 mode={mode}
+                domain={domain}
               />
             )}
           </>

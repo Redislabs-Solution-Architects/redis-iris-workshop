@@ -134,6 +134,19 @@ class LangCacheBase:
             log.warning("LangCache store failed: %s", exc)
             return False
 
+    async def flush(self) -> bool:
+        """Flush all entries from the cache (rebuilds the search index)."""
+        if not self.has_credentials():
+            return False
+        client = await self._get_client()
+        try:
+            resp = await client.post("/flush")
+            resp.raise_for_status()
+            return True
+        except Exception as exc:
+            log.warning("LangCache flush failed: %s", exc)
+            return False
+
     async def close(self) -> None:
         """Shut down the underlying HTTP client."""
         if self._client:

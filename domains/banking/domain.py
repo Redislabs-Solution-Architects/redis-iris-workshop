@@ -128,10 +128,10 @@ class RadishBankDomain:
         ),
         guardrail=GuardrailConfig(
             router_name="banking-guardrails",
-            allowed_route_name="banking",
+            allowed_route_name="allow_list",
             routes=[
                 GuardrailRouteConfig(
-                    name="banking",
+                    name="allow_list",
                     references=[
                         "Check my savings balance",
                         "What are my account balances?",
@@ -163,7 +163,7 @@ class RadishBankDomain:
                     distance_threshold=0.7,
                 ),
                 GuardrailRouteConfig(
-                    name="off_topic",
+                    name="deny_list",
                     references=[
                         "Why is the sky blue?",
                         "Who is the current US president?",
@@ -186,7 +186,14 @@ class RadishBankDomain:
             ],
         ),
         seed_memories=[
-            SeedMemory(text="Prefers paperless statements and is interested in fixed deposits", topics=["banking", "preferences"]),
+            SeedMemory(
+                text="Prefers paperless statements and online banking",
+                topics=["banking", "preferences"],
+            ),
+            SeedMemory(
+                text="Interested in fixed deposit products for savings growth",
+                topics=["products", "interests"],
+            ),
         ],
         seed_langcache=[
             SeedLangCacheEntry(

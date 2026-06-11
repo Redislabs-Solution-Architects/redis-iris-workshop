@@ -43,6 +43,10 @@ async def main() -> None:
         return
 
     print(f"Domain: {args.domain}")
+    print("Flushing existing LangCache entries...")
+    flushed = await service.flush()
+    print(f"  {'OK' if flushed else 'FAILED (continuing anyway)'}")
+
     print(f"Seeding {len(seed_entries)} entries...")
     for entry in seed_entries:
         try:

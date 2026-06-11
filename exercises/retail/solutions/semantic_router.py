@@ -10,7 +10,7 @@ class GuardrailService(GuardrailBase):
     def define_routes(self):
         return [
             Route(
-                name="electronics_retail",
+                name="allow_list",
                 references=[
                     "What laptops do you have in stock?",
                     "I'm looking for a gaming PC",
@@ -24,12 +24,13 @@ class GuardrailService(GuardrailBase):
                     "What's on sale right now?",
                     "Can you help me?",
                     "What do you know about me?",
+                    "Remember my preferences",
                     "Hello",
                 ],
                 distance_threshold=0.7,
             ),
             Route(
-                name="off_topic",
+                name="deny_list",
                 references=[
                     "What's the weather like today?",
                     "Tell me a joke",

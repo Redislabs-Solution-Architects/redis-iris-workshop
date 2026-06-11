@@ -228,6 +228,10 @@ class MemoryBase:
         if payload is None:
             return []
 
+        if not text:
+            payload.pop("text", None)
+            payload.pop("similarityThreshold", None)
+
         client = self._get_async_client()
         response = await client.post("/long-term-memory/search", json=payload)
         if response.status_code >= 400:

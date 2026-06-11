@@ -10,7 +10,7 @@ class GuardrailService(GuardrailBase):
     def define_routes(self):
         return [
             Route(
-                name="financial_research",
+                name="allow_list",
                 references=[
                     "Compare the latest NVIDIA and AMD filings",
                     "What changed in Broadcom's earnings this quarter?",
@@ -22,12 +22,13 @@ class GuardrailService(GuardrailBase):
                     "What did management say about AI revenue?",
                     "Can you help me?",
                     "What do you know about me?",
+                    "Remember my analysis preferences",
                     "Hello",
                 ],
                 distance_threshold=0.7,
             ),
             Route(
-                name="off_topic",
+                name="deny_list",
                 references=[
                     "What's the weather like today?",
                     "Tell me a joke",

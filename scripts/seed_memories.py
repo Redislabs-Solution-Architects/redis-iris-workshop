@@ -20,6 +20,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 import httpx
 
 from backend.app.core.domain_loader import load_domain
+from backend.app.redis_connection import create_redis_client
 from backend.app.services.memory_service import MemoryService
 from backend.app.bases.memory_base import sanitize_owner_id
 from backend.app.settings import get_settings
@@ -126,7 +127,51 @@ def main() -> None:
             else:
                 print(f"  FAILED: {entry.text!r} -> {resp.status_code}: {resp.text}")
 
+    _ensure_memory_index(settings)
     print("Done.")
+
+
+def _ensure_memory_index(settings) -> None:
+    """Ensure the Memory API's FT search index exists on the backing Redis.
+
+    The Memory API stores data in our Redis Cloud database. A FLUSHDB or
+    eviction can destroy the index; we recreate it so search works.
+    """
+    store_id = settings.memory_store_id
+    if not store_id:
+        return
+    index_name = f"memory:{store_id}:ltm"
+    prefix = f"memory:{store_id}:ltm:"
+    r = create_redis_client(settings)
+    try:
+        r.execute_command("FT.INFO", index_name)
+        return
+    except Exception:
+        pass
+    print(f"  Recreating memory search index '{index_name}'...")
+    try:
+        r.execute_command(
+            "FT.CREATE", index_name,
+            "ON", "HASH",
+            "PREFIX", "1", prefix,
+            "SCHEMA",
+            "text", "TEXT",
+            "owner_id", "TAG",
+            "namespace", "TAG",
+            "memory_type", "TAG",
+            "topics", "TAG", "SEPARATOR", ",",
+            "session_id", "TAG",
+            "id", "TAG",
+            "created_at", "NUMERIC",
+            "updated_at", "NUMERIC",
+            "text_vector", "VECTOR", "HNSW", "6",
+            "TYPE", "FLOAT32",
+            "DIM", "3072",
+            "DISTANCE_METRIC", "COSINE",
+        )
+        print("  Index created.")
+    except Exception as e:
+        print(f"  Index creation failed: {e}")
 
 
 if __name__ == "__main__":

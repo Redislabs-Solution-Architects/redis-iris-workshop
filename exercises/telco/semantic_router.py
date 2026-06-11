@@ -13,8 +13,8 @@ class GuardrailService(GuardrailBase):
         """Define semantic routes for query classification.
 
         There are two routes:
-        1. A "wireless_support" route -- queries your agent should handle
-        2. An "off_topic" route -- queries that should be blocked
+        1. A "allow_list" route -- queries your agent should handle
+        2. A "deny_list" route -- queries that should be blocked
 
         Each Route needs:
             name=???,                 # route identifier
@@ -25,7 +25,7 @@ class GuardrailService(GuardrailBase):
         """
         return [
             Route(
-                name="wireless_support",
+                name="allow_list",
                 references=[
                     "Why is my bill so high this month?",
                     "How do I upgrade my phone?",
@@ -40,7 +40,7 @@ class GuardrailService(GuardrailBase):
                 distance_threshold=0.7,
             ),
             Route(
-                name="off_topic",
+                name="deny_list",
                 references=[
                     "What's the weather like today?",
                     "Tell me a joke",

@@ -13,8 +13,8 @@ class GuardrailService(GuardrailBase):
         """Define semantic routes for query classification.
 
         There are two routes:
-        1. An "electronics_retail" route -- queries your agent should handle
-        2. An "off_topic" route -- queries that should be blocked
+        1. An "allow_list" route -- queries your agent should handle
+        2. A "deny_list" route -- queries that should be blocked
 
         Each Route needs:
             name=???,                 # route identifier
@@ -25,7 +25,7 @@ class GuardrailService(GuardrailBase):
         """
         return [
             Route(
-                name="electronics_retail",
+                name="allow_list",
                 references=[
                     "What laptops do you have in stock?",
                     "Can I pick that up at my local store?",
@@ -40,7 +40,7 @@ class GuardrailService(GuardrailBase):
                 distance_threshold=0.7,
             ),
             Route(
-                name="off_topic",
+                name="deny_list",
                 references=[
                     "Write me a Python script",
                     "Tell me a joke",

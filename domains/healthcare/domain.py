@@ -101,10 +101,10 @@ class HealthcareDomain:
         ),
         guardrail=GuardrailConfig(
             router_name="healthcare-guardrails",
-            allowed_route_name="healthcare",
+            allowed_route_name="allow_list",
             routes=[
                 GuardrailRouteConfig(
-                    name="healthcare",
+                    name="allow_list",
                     references=[
                         "Do I have any upcoming appointments?",
                         "When is my next appointment?",
@@ -145,7 +145,7 @@ class HealthcareDomain:
                     distance_threshold=0.7,
                 ),
                 GuardrailRouteConfig(
-                    name="off_topic",
+                    name="deny_list",
                     references=[
                         "What's the weather like today?",
                         "Write me a Python script",

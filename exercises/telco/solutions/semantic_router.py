@@ -10,7 +10,7 @@ class GuardrailService(GuardrailBase):
     def define_routes(self):
         return [
             Route(
-                name="wireless_support",
+                name="allow_list",
                 references=[
                     "Why is my bill so high this month?",
                     "What's this charge on my bill?",
@@ -27,12 +27,13 @@ class GuardrailService(GuardrailBase):
                     "I have no signal at home",
                     "Can you help me?",
                     "What do you know about my preferences?",
+                    "Remember my account preferences",
                     "Hello",
                 ],
                 distance_threshold=0.7,
             ),
             Route(
-                name="off_topic",
+                name="deny_list",
                 references=[
                     "What's the weather like today?",
                     "Write me a Python script",

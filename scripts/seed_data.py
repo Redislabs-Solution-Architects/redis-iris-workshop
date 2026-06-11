@@ -207,7 +207,7 @@ def main() -> None:
 
     meta_key = f"{args.domain}:meta:dataset"
     client.delete(meta_key)
-    client.hset(meta_key, mapping={"documents": str(loaded)})
+    client.execute_command("JSON.SET", meta_key, "$", json.dumps({"documents": loaded}))
     print(f"  Set dataset meta: {meta_key}")
 
     print(f"\nDone! {args.domain} RAG documents are ready for Vector Search.")

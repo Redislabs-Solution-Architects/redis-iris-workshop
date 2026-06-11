@@ -10,7 +10,7 @@ class GuardrailService(GuardrailBase):
     def define_routes(self):
         return [
             Route(
-                name="banking",
+                name="allow_list",
                 references=[
                     "Check my savings balance",
                     "What are my account balances?",
@@ -20,6 +20,8 @@ class GuardrailService(GuardrailBase):
                     "What accounts do I have?",
                     "Early withdrawal penalty",
                     "Place 2000 SGD in the 6-month FD",
+                    "Show me my service request history",
+                    "Remember my preferences",
                     "Can you help me?",
                     "What do you know about me?",
                     "Hello",
@@ -27,7 +29,7 @@ class GuardrailService(GuardrailBase):
                 distance_threshold=0.7,
             ),
             Route(
-                name="off_topic",
+                name="deny_list",
                 references=[
                     "Why is the sky blue?",
                     "Who is the current US president?",

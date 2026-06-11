@@ -275,6 +275,10 @@ async def domain_config() -> JSONResponse:
         "starter_prompts": [card.model_dump() for card in branding.starter_prompts],
         "theme": branding.theme.model_dump(),
         "logo_src": _logo_src(ROOT_DIR / branding.logo_path),
+        "seed_langcache": [
+            {"prompt": e.prompt, "response": e.response}
+            for e in domain.manifest.seed_langcache
+        ],
     })
 
 

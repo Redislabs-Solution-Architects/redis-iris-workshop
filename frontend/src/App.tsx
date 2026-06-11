@@ -396,6 +396,7 @@ export default function App() {
         toolsData={toolsData}
         toolsLoading={toolsLoading}
         mode={mode}
+        domain={domain}
       />
     </div>
   );

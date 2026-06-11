@@ -128,10 +128,10 @@ class ElectrohubDomain:
         ),
         guardrail=GuardrailConfig(
             router_name="retail-guardrails",
-            allowed_route_name="electronics_retail",
+            allowed_route_name="allow_list",
             routes=[
                 GuardrailRouteConfig(
-                    name="electronics_retail",
+                    name="allow_list",
                     references=[
                         "What laptops do you have in stock?",
                         "I'm looking for a gaming PC",
@@ -167,7 +167,7 @@ class ElectrohubDomain:
                     distance_threshold=0.7,
                 ),
                 GuardrailRouteConfig(
-                    name="off_topic",
+                    name="deny_list",
                     references=[
                         "What's the weather like today?",
                         "Tell me a joke",

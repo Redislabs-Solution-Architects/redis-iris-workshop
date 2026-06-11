@@ -31,7 +31,7 @@ class GuardrailService(GuardrailBase):
                     "I want a refund",
                     "My food was cold when it arrived",
                     "What restaurants are nearby?",
-                    "What should I order?",
+                    "Recommend me something to eat",
                     "What's the status of my delivery?",
                     "Can you help me?",
                     "What do you know about me?",

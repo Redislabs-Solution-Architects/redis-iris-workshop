@@ -10,11 +10,11 @@ class GuardrailService(GuardrailBase):
     def define_routes(self):
         return [
             Route(
-                name="healthcare",
+                name="allow_list",
                 references=[
-                    "Do I have any upcoming appointments?",
+                    "Show me my appointment calendar",
                     "When is my next appointment?",
-                    "What's the status of my referral?",
+                    "I need an update on my referral",
                     "Who is my primary care provider?",
                     "Is telehealth available for my visit?",
                     "What's my insurance status?",
@@ -22,12 +22,13 @@ class GuardrailService(GuardrailBase):
                     "What do you know about me?",
                     "I need to schedule a follow-up",
                     "Can I reschedule my appointment?",
+                    "Remember my preferences",
                     "Hello",
                 ],
                 distance_threshold=0.7,
             ),
             Route(
-                name="off_topic",
+                name="deny_list",
                 references=[
                     "Write me a Python script",
                     "Tell me a joke",
