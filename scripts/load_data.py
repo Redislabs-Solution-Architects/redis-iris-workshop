@@ -69,21 +69,31 @@ async def main() -> None:
     output_dir = ROOT / domain.manifest.output_dir
     raw_records = load_records(output_dir=output_dir, entity_by_file=entity_by_file)
 
+    failed_entities: list[str] = []
     async with UnifiedClient() as client:
         for class_name, rows in raw_records.items():
             model_cls = generated_models[class_name]
             model_instances = [model_cls(**row) for row in rows]
-            result = await client.import_data(
-                admin_key=admin_key,
-                context_surface_id=surface_id,
-                records=model_instances,
-                on_conflict="overwrite",
-                on_error="fail_fast",
-            )
-            print(f"  {class_name}: imported={result.imported}, failed={result.failed}")
-            if result.errors:
-                for err in result.errors:
-                    print(f"    Error: {err}")
+            try:
+                result = await client.import_data(
+                    admin_key=admin_key,
+                    context_surface_id=surface_id,
+                    records=model_instances,
+                    on_conflict="overwrite",
+                    on_error="fail_fast",
+                )
+                print(f"  {class_name}: imported={result.imported}, failed={result.failed}")
+                if result.errors:
+                    for err in result.errors:
+                        print(f"    Error: {err}")
+            except Exception as exc:
+                failed_entities.append(class_name)
+                print(f"  {class_name}: SKIPPED ({type(exc).__name__}: {exc})")
+
+    if failed_entities:
+        print(f"\n  Warning: {len(failed_entities)} entity type(s) failed to import: {', '.join(failed_entities)}")
+        print("  The agent will still work but may not have data for those entities.")
+        print("  This is usually caused by a temporary API issue — try `make load-data` again.")
 
     summary = domain.write_dataset_meta(settings=settings, records=raw_records)
     print(f"  Wrote dataset summary → {domain.manifest.namespace.dataset_meta_key}")

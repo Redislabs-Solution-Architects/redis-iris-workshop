@@ -84,21 +84,7 @@ generate-data:
 	@uv run python scripts/generate_data.py --domain $(DOMAIN)
 
 flush-redis:
-	@uv run python -c "\
-	from backend.app.settings import get_settings; \
-	from backend.app.redis_connection import create_redis_client; \
-	s = get_settings(); r = create_redis_client(s); \
-	cursor, deleted, preserved = 0, 0, 0; \
-	while True: \
-	    cursor, keys = r.scan(cursor=cursor, count=500); \
-	    if keys: \
-	        keep = [k for k in keys if (k if isinstance(k, str) else k.decode()).startswith('memory:')]; \
-	        drop = [k for k in keys if k not in keep]; \
-	        if drop: r.delete(*drop); deleted += len(drop); \
-	        preserved += len(keep); \
-	    if cursor == 0: break; \
-	print('Flushed Redis at %s:%d/%d' % (s.redis_host, s.redis_port, s.redis_db)); \
-	print('  Deleted %d keys, preserved %d memory keys' % (deleted, preserved))"
+	@uv run python scripts/flush_redis.py
 
 reset: flush-redis
 	@echo "Re-seeding policy data..."
