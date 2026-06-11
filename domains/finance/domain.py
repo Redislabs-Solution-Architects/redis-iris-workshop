@@ -207,7 +207,7 @@ class FinanceResearcherDomain:
                     "- **Broadcom (AVGO)**: Steady gross profit growth driven by infrastructure and networking demand.\n\n"
                     "For detailed numbers, I can pull the exact quarterly metrics from the research database."
                 ),
-                attributes={"domain": "finance"},
+                attributes={},
             ),
         ],
     )

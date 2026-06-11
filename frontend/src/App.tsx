@@ -327,9 +327,10 @@ export default function App() {
     <div className={`shell ${activityPanelOpen ? "panel-open" : ""} ${!hasMessages ? "shell--landing" : ""}`}>
       <header className="topbar">
         <div className="topbar-brand" onClick={handleGoHome} onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") handleGoHome(); }} role="button" tabIndex={0} style={{ cursor: "pointer" }}>
+          {domain?.logo_src && <img src={domain.logo_src} alt="" className="topbar-brand-logo" />}
           <div className="brand-text">
-            <span className="brand-name"><span className="brand-accent">Redis</span> Eats</span>
-            <span className="brand-subtitle">Food Delivery Support</span>
+            <span className="brand-name">{domain?.app_name ?? "Redis Iris"}</span>
+            <span className="brand-subtitle">{domain?.subtitle ?? "AI Assistant"}</span>
           </div>
         </div>
         <div className="topbar-actions">

@@ -37,8 +37,10 @@ Memory tools (durable customer context):
      pre-loaded into your context automatically. Do NOT call search_customer_memory
      unless the user explicitly asks "what do you remember about me" or asks
      about a specific past preference.
-   • Call remember_customer_detail only when the user explicitly says "remember"
-     or clearly states a durable preference or lasting fact worth saving.
+   • ALWAYS call remember_customer_detail when the customer shares a personal detail,
+     preference, or instruction about how they want things done — delivery instructions,
+     dietary restrictions, favorite restaurants, etc. These are lasting preferences
+     that MUST be saved. Also call it when the user explicitly says "remember".
 """.rstrip()
 
     return f"""\
@@ -68,9 +70,9 @@ Context Surface tools (query Redis via MCP):
 3. USE SHORT SEARCH QUERIES for policy search. Good: "late delivery", "refund",
    "cancellation", "membership". Bad: "late delivery compensation policy".
 
-4. FOR FILTER TOOLS, prefer the exact parameter name expected by the tool
-   schema. For example, filter_order_by_customer_id should usually be called
-   with value=<customer_id> unless the tool schema shows a different field.
+4. FOR FILTER TOOLS, pass plain entity IDs only — e.g. value="ORD_001",
+   value="CUST_DEMO_001". NEVER prepend Redis key prefixes like
+   "reddash_order:" or "reddash_customer:". The tool handles key resolution.
 
 5. DO NOT claim there are "technical difficulties" or that data is unavailable
    if a tool already returned matching records. If order records are returned,

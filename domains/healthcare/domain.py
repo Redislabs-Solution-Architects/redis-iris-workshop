@@ -181,7 +181,7 @@ class HealthcareDomain:
                     "most visit types. If you need a specific specialist, your primary care provider can "
                     "submit a referral, which typically takes **3-5 business days** to process."
                 ),
-                attributes={"domain": "healthcare"},
+                attributes={},
             ),
         ],
     )

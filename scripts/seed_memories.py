@@ -27,7 +27,7 @@ from backend.app.settings import get_settings
 
 def main() -> None:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--domain", default=os.getenv("DEMO_DOMAIN") or "reddash")
+    parser.add_argument("--domain", default=os.getenv("DEMO_DOMAIN") or "digital-native")
     args = parser.parse_args()
 
     settings = get_settings()

@@ -183,7 +183,7 @@ class RMobileDomain:
                     "For example, a recent iPhone in good condition can qualify for up to **$800 in credits** "
                     "toward a new device. Want me to check what your current device is worth?"
                 ),
-                attributes={"domain": "telco"},
+                attributes={},
             ),
         ],
     )

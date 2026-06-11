@@ -188,8 +188,8 @@ def main() -> None:
         sys.exit(1)
 
     api_url = str(cs_config.api_url).rstrip("/")
-    surface_name = env.get("CTX_SURFACE_NAME", domain.manifest.namespace.surface_name)
-    agent_name = env.get("CTX_AGENT_NAME", domain.manifest.namespace.agent_name)
+    surface_name = env.get("CTX_SURFACE_NAME") or domain.manifest.namespace.surface_name
+    agent_name = env.get("CTX_AGENT_NAME") or domain.manifest.namespace.agent_name
     surface_id = env.get("CTX_SURFACE_ID", "") if not args.force_create else ""
     agent_key = env.get("MCP_AGENT_KEY", "") if not args.force_create else ""
 

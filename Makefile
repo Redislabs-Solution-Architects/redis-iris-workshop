@@ -1,7 +1,7 @@
 BACKEND_HOST ?= 127.0.0.1
 BACKEND_PORT ?= 8040
 FRONTEND_PORT ?= 3040
-DOMAIN ?= $(or $(shell grep -s '^DEMO_DOMAIN=' .env | cut -d= -f2),reddash)
+DOMAIN ?= $(or $(shell grep -s '^DEMO_DOMAIN=' .env | cut -d= -f2),digital-native)
 
 .PHONY: help install backend-install frontend-install dev backend frontend \
 	seed-data setup-surface load-data seed-langcache seed-memories \

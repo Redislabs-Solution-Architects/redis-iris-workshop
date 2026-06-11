@@ -79,7 +79,7 @@ def render(domain_id: str) -> str:
 
 def main() -> None:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--domain", default="reddash")
+    parser.add_argument("--domain", default="digital-native")
     args = parser.parse_args()
 
     domain = load_domain(args.domain)

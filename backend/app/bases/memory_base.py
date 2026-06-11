@@ -64,6 +64,17 @@ class MemoryBase:
     def __init__(self, settings: Settings) -> None:
         self.settings = settings
         self._async_client: httpx.AsyncClient | None = None
+        base = (settings.memory_api_base_url or "").rstrip("/")
+        store_id = settings.memory_store_id or ""
+        self._base_url_prefix: str = f"{base}/v1/stores/{store_id}" if base and store_id else ""
+        api_key = settings.memory_api_key or ""
+        if api_key and not api_key.lower().startswith(("bearer ", "basic ")):
+            api_key = f"Bearer {api_key}"
+        self._cached_headers: dict[str, str] = {
+            "Authorization": api_key,
+            "Accept": "application/json",
+            "Content-Type": "application/json",
+        }
 
     def has_credentials(self) -> bool:
         """Return True when API credentials are present (ignores exercise completion)."""
@@ -92,28 +103,15 @@ class MemoryBase:
     def _get_async_client(self) -> httpx.AsyncClient:
         if self._async_client is None or self._async_client.is_closed:
             self._async_client = httpx.AsyncClient(
-                timeout=httpx.Timeout(30.0, connect=10.0),
+                base_url=self._base_url_prefix,
+                headers=self._cached_headers,
+                timeout=httpx.Timeout(15.0, connect=5.0),
             )
         return self._async_client
 
-    def _headers(self) -> dict[str, str]:
-        api_key = self.settings.memory_api_key
-        if not api_key.lower().startswith(("bearer ", "basic ")):
-            api_key = f"Bearer {api_key}"
-        return {
-            "Authorization": api_key,
-            "Accept": "application/json",
-            "Content-Type": "application/json",
-        }
-
-    def _url(self, path: str) -> str:
-        base = self.settings.memory_api_base_url.rstrip("/")
-        store_id = self.settings.memory_store_id
-        return f"{base}/v1/stores/{store_id}{path}"
-
     def _search_filter(self, session_id: str | None = None) -> dict:
         owner_id = sanitize_owner_id(self.settings.memory_owner_id)
-        domain = self.settings.demo_domain or "reddash"
+        domain = self.settings.demo_domain or "digital-native"
         namespace = self.settings.memory_namespace.strip() or f"{domain}-demo"
         filt: dict[str, Any] = {
             "ownerId": {"eq": owner_id},
@@ -199,11 +197,7 @@ class MemoryBase:
             return {}
 
         client = self._get_async_client()
-        response = await client.post(
-            self._url("/session-memory/events"),
-            headers=self._headers(),
-            json=payload,
-        )
+        response = await client.post("/session-memory/events", json=payload)
         if response.status_code >= 400:
             raise RuntimeError(f"Memory API {response.status_code}: {response.text}")
         return response.json() if response.content else {}
@@ -211,10 +205,7 @@ class MemoryBase:
     async def get_session(self, *, owner_id: str, session_id: str) -> dict:
         """Retrieve session memory (fully pre-built, no hook needed)."""
         client = self._get_async_client()
-        response = await client.get(
-            self._url(f"/session-memory/{session_id}"),
-            headers=self._headers(),
-        )
+        response = await client.get(f"/session-memory/{session_id}")
         if response.status_code >= 400:
             raise RuntimeError(f"Memory API {response.status_code}: {response.text}")
         return response.json() if response.content else {}
@@ -238,11 +229,7 @@ class MemoryBase:
             return []
 
         client = self._get_async_client()
-        response = await client.post(
-            self._url("/long-term-memory/search"),
-            headers=self._headers(),
-            json=payload,
-        )
+        response = await client.post("/long-term-memory/search", json=payload)
         if response.status_code >= 400:
             raise RuntimeError(f"Memory API {response.status_code}: {response.text}")
         body = response.json() if response.content else {}

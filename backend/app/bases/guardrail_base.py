@@ -66,7 +66,7 @@ class GuardrailBase:
                     vectorizer=vectorizer,
                     routes=routes,
                     redis_url=self._redis_url,
-                    overwrite=False,
+                    overwrite=True,
                 )
 
             self._router = await asyncio.to_thread(_build)
@@ -110,6 +110,8 @@ class GuardrailBase:
             if router is None:
                 return {"allowed": True, "route": None, "distance": None}
             match = await asyncio.to_thread(router, None, vector)
+            if match.name is None:
+                return {"allowed": False, "route": None, "distance": None}
             return self._classify_result(match.name, match.distance)
         except Exception:
             return {"allowed": True, "route": None, "distance": None}

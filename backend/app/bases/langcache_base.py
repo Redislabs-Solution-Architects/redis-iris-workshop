@@ -25,7 +25,13 @@ class LangCacheBase:
         self._host: str = (settings.langcache_host or "").rstrip("/")
         self._cache_id: str = settings.langcache_cache_id or ""
         self._api_key: str = settings.langcache_api_key or ""
-        self._threshold: float = settings.langcache_threshold
+        self._base_url_prefix: str = (
+            f"{self._host}/v1/caches/{self._cache_id}" if self._host and self._cache_id else ""
+        )
+        self._cached_headers: dict[str, str] = {
+            "Authorization": f"Bearer {self._api_key}",
+            "Content-Type": "application/json",
+        }
         self._client: httpx.AsyncClient | None = None
 
     def has_credentials(self) -> bool:
@@ -42,18 +48,13 @@ class LangCacheBase:
     # Internals (pre-built)
     # ------------------------------------------------------------------
 
-    def _base_url(self) -> str:
-        return f"{self._host}/v1/caches/{self._cache_id}"
-
-    def _headers(self) -> dict[str, str]:
-        return {
-            "Authorization": f"Bearer {self._api_key}",
-            "Content-Type": "application/json",
-        }
-
     async def _get_client(self) -> httpx.AsyncClient:
         if self._client is None:
-            self._client = httpx.AsyncClient(timeout=10.0)
+            self._client = httpx.AsyncClient(
+                base_url=self._base_url_prefix,
+                headers=self._cached_headers,
+                timeout=httpx.Timeout(10.0, connect=5.0),
+            )
         return self._client
 
     # ------------------------------------------------------------------
@@ -82,7 +83,7 @@ class LangCacheBase:
 
     async def search(self, prompt: str) -> dict | None:
         """Search the semantic cache for a matching entry."""
-        if not self.is_configured():
+        if not self.has_credentials():
             return None
 
         body = self.search_request_body(prompt)
@@ -91,11 +92,7 @@ class LangCacheBase:
 
         client = await self._get_client()
         try:
-            resp = await client.post(
-                f"{self._base_url()}/entries/search",
-                headers=self._headers(),
-                json=body,
-            )
+            resp = await client.post("/entries/search", json=body)
             resp.raise_for_status()
             data = resp.json()
             entries = data.get("data", [])
@@ -127,8 +124,7 @@ class LangCacheBase:
 
         client = await self._get_client()
         try:
-            url = f"{self._base_url()}/entries"
-            resp = await client.post(url, headers=self._headers(), json=body)
+            resp = await client.post("/entries", json=body)
             resp.raise_for_status()
             return True
         except httpx.HTTPStatusError as exc:

@@ -198,7 +198,7 @@ class RadishBankDomain:
                     "Interest is calculated daily and paid at maturity. Early withdrawal forfeits all accrued interest. "
                     "You can open an FD through your account portal or visit any Radish Bank branch."
                 ),
-                attributes={"domain": "banking"},
+                attributes={},
             ),
         ],
     )

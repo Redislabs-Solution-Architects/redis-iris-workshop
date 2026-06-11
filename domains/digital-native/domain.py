@@ -54,7 +54,7 @@ class ReddashDomain:
     manifest = DomainManifest(
         id="digital-native",
         description="Food-delivery support demo comparing Context Surfaces vs simple RAG.",
-        generated_models_module="domains.digital_native.generated_models",
+        generated_models_module="domains.digital-native.generated_models",
         generated_models_path="domains/digital-native/generated_models.py",
         output_dir="output/digital-native",
         branding=BrandingConfig(
@@ -192,7 +192,7 @@ class ReddashDomain:
                     "you may qualify for a **full order refund**. Please contact support with your "
                     "order details to start the process."
                 ),
-                attributes={"domain": "digital-native"},
+                attributes={},
             ),
         ],
     )

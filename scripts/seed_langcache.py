@@ -25,7 +25,7 @@ async def main() -> None:
     logging.basicConfig(level=logging.INFO)
 
     parser = argparse.ArgumentParser()
-    parser.add_argument("--domain", default=os.getenv("DEMO_DOMAIN") or "reddash")
+    parser.add_argument("--domain", default=os.getenv("DEMO_DOMAIN") or "digital-native")
     args = parser.parse_args()
 
     settings = get_settings()

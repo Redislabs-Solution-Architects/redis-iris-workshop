@@ -19,7 +19,7 @@ load_dotenv(ROOT / ".env")
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-OUTPUT_DIR = ROOT / "output" / "electrohub"
+OUTPUT_DIR = ROOT / "output" / "retail"
 
 
 def ts(dt: datetime) -> str:

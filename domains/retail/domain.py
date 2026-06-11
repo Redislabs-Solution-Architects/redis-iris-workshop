@@ -203,7 +203,7 @@ class ElectrohubDomain:
                     "warranty period. Bring your receipt or order confirmation to any ElectroHub store, or "
                     "start a return online through your order history."
                 ),
-                attributes={"domain": "retail"},
+                attributes={},
             ),
         ],
     )

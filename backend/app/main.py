@@ -14,6 +14,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, StreamingResponse
 from langchain_core.messages import AIMessage
 
+import backend.app.settings  # noqa: F401  — load dotenv before service imports
 from backend.app.services.context_service import ContextSurfaceService
 from backend.app.core.domain_loader import get_active_domain
 from backend.app.contracts import ChatRequest

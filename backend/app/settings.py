@@ -56,7 +56,7 @@ class Settings(BaseSettings):
     backend_port: int = Field(default=8040)
     cors_origin: str = Field(default="http://localhost:3040")
     guardrail_enabled: bool = Field(default=False)
-    demo_domain: str = Field(default="reddash")
+    demo_domain: str = Field(default="digital-native")
     show_final_verifier_trace_step: bool = Field(default=False)
     show_llm_trace_steps: bool = Field(default=False)
 

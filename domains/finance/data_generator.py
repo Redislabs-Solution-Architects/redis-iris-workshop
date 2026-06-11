@@ -22,7 +22,7 @@ from backend.app.core.domain_contract import GeneratedDataset
 
 
 ROOT = Path(__file__).resolve().parents[2]
-OUTPUT_DIR = ROOT / "output" / "finance-researcher"
+OUTPUT_DIR = ROOT / "output" / "finance"
 LOCAL_PRICE_DATA_DIR = Path(__file__).resolve().parent / "data" / "prices"
 EMBED_DIMENSION = 1536
 LIVE_SOURCES_ENV_VAR = "FINANCE_RESEARCHER_USE_LIVE_SOURCES"
