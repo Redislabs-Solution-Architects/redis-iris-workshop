@@ -72,6 +72,13 @@ button { cursor: pointer; border: none; background: none; }
   min-height: 0;
 }
 
+.app-loading {
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-secondary);
+  font-size: 0.95rem;
+}
+
 /* ── Landing warm background ───────────────────────── */
 .shell--landing {
   background: var(--landing-bg, var(--color-warm-bg));
@@ -1381,4 +1388,3 @@ button { cursor: pointer; border: none; background: none; }
     display: none;
   }
 }
-
