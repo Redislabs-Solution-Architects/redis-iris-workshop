@@ -71,6 +71,12 @@ class Customer(ContextModel):
         source_field="customer_id",
     )
 
+    home_store: Any = ContextRelationship(
+        description="Preferred local store",
+        target="Store",
+        source_field="home_store_id",
+    )
+
 
 class Store(ContextModel):
     """Store entity for the ElectroHub domain."""
@@ -355,6 +361,18 @@ class Order(ContextModel):
         index="text",
     )
 
+    customer: Any = ContextRelationship(
+        description="Customer who placed the order",
+        target="Customer",
+        source_field="customer_id",
+    )
+
+    store: Any = ContextRelationship(
+        description="Pickup store for the order",
+        target="Store",
+        source_field="store_id",
+    )
+
 
 class OrderItem(ContextModel):
     """OrderItem entity for the ElectroHub domain."""
@@ -394,6 +412,18 @@ class OrderItem(ContextModel):
     fulfillment_status: str = ContextField(
         description="Line-item fulfillment status",
         index="tag",
+    )
+
+    order: Any = ContextRelationship(
+        description="Parent order",
+        target="Order",
+        source_field="order_id",
+    )
+
+    product: Any = ContextRelationship(
+        description="Product ordered on this line",
+        target="Product",
+        source_field="product_id",
     )
 
 
@@ -450,6 +480,12 @@ class Shipment(ContextModel):
         index="text",
     )
 
+    order: Any = ContextRelationship(
+        description="Parent order",
+        target="Order",
+        source_field="order_id",
+    )
+
 
 class ShipmentEvent(ContextModel):
     """ShipmentEvent entity for the ElectroHub domain."""
@@ -488,6 +524,18 @@ class ShipmentEvent(ContextModel):
     description: str = ContextField(
         description="Human-readable event description",
         index="text",
+    )
+
+    shipment: Any = ContextRelationship(
+        description="Parent shipment",
+        target="Shipment",
+        source_field="shipment_id",
+    )
+
+    order: Any = ContextRelationship(
+        description="Associated order",
+        target="Order",
+        source_field="order_id",
     )
 
 
@@ -533,6 +581,18 @@ class SupportCase(ContextModel):
     resolution: str | None = ContextField(
         description="Resolution summary",
         index="text",
+    )
+
+    customer: Any = ContextRelationship(
+        description="Customer who opened the case",
+        target="Customer",
+        source_field="customer_id",
+    )
+
+    order: Any = ContextRelationship(
+        description="Related order",
+        target="Order",
+        source_field="order_id",
     )
 
 
