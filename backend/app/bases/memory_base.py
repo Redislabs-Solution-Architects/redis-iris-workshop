@@ -234,6 +234,8 @@ class MemoryBase:
 
         client = self._get_async_client()
         response = await client.post("/long-term-memory/search", json=payload)
+        if response.status_code == 424 and "index not found" in (response.text or "").lower():
+            return []
         if response.status_code >= 400:
             raise RuntimeError(f"Memory API {response.status_code}: {response.text}")
         body = response.json() if response.content else {}

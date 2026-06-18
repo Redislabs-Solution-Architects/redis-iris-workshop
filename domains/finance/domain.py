@@ -71,7 +71,7 @@ class FinanceResearcherDomain:
                 PromptCard(
                     eyebrow="Cached",
                     title="Gross profit trends",
-                    prompt="Compare the latest gross profit trends for NVIDIA, AMD, and Broadcom",
+                    prompt="How do NVIDIA, AMD, and Broadcom gross margins compare recently?",
                 ),
             ],
             theme=ThemeConfig(

@@ -73,7 +73,7 @@ class RadishBankDomain:
                 PromptCard(
                     eyebrow="Cached",
                     title="Fixed deposit rates",
-                    prompt="What are your current fixed deposit interest rates?",
+                    prompt="Tell me about your fixed deposit rates and terms",
                 ),
             ],
             theme=ThemeConfig(

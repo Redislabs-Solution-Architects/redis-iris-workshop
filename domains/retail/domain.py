@@ -74,7 +74,7 @@ class ElectrohubDomain:
                 PromptCard(
                     eyebrow="Cached",
                     title="Return policy",
-                    prompt="What's your return policy for electronics?",
+                    prompt="How do electronics returns work at your store?",
                 ),
             ],
             theme=ThemeConfig(

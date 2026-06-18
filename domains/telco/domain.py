@@ -54,7 +54,7 @@ class RMobileDomain:
                 PromptCard(eyebrow="Context", title="Device upgrade eligibility", prompt="Am I eligible to upgrade my phone?"),
                 PromptCard(eyebrow="Memory", title="Save preferences", prompt="I always want paperless billing and autopay on"),
                 PromptCard(eyebrow="Memory", title="Recommendations for me", prompt="What add-ons or plans would you recommend for me?"),
-                PromptCard(eyebrow="Cached", title="Trade-in policy", prompt="What is your device trade-in policy?"),
+                PromptCard(eyebrow="Cached", title="Trade-in policy", prompt="How does your device trade-in program work?"),
             ],
             theme=ThemeConfig(
                 bg="#0d0a12",

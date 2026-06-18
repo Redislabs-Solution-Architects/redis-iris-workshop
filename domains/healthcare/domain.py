@@ -54,7 +54,7 @@ class HealthcareDomain:
                 PromptCard(eyebrow="Context", title="What's the status of my referrals?", prompt="What's the status of my referrals?"),
                 PromptCard(eyebrow="Memory", title="Save scheduling preferences", prompt="Please remember that I prefer telehealth visits whenever possible"),
                 PromptCard(eyebrow="Memory", title="Appointment recommendations", prompt="Based on what you know about my preferences, what kind of appointment should I schedule?"),
-                PromptCard(eyebrow="Cached", title="Schedule a follow-up", prompt="How do I schedule a follow-up appointment?"),
+                PromptCard(eyebrow="Cached", title="Schedule a follow-up", prompt="What's the process for booking a follow-up visit?"),
             ],
             theme=ThemeConfig(
                 bg="#0a1628",

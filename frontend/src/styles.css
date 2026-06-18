@@ -355,7 +355,7 @@ button { cursor: pointer; border: none; background: none; }
 .composer {
   position: relative;
   width: 100%;
-  max-width: 600px;
+  max-width: 740px;
   margin: 0 auto;
   border: 1px solid var(--color-border);
   border-radius: var(--radius-xl);
@@ -380,7 +380,7 @@ button { cursor: pointer; border: none; background: none; }
 }
 
 .composer.hero textarea {
-  min-height: 20px;
+  min-height: 56px;
   padding: 12px 48px 12px 20px;
 }
 
