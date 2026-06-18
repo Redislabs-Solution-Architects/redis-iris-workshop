@@ -12,6 +12,13 @@ export default defineConfig(({ mode }) => {
         "/api": {
           target,
           changeOrigin: true,
+          configure: (proxy) => {
+            proxy.on("error", (err) => {
+              if ((err as NodeJS.ErrnoException).code !== "ECONNREFUSED") {
+                console.error(err);
+              }
+            });
+          },
         },
       },
     },
