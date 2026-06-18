@@ -953,13 +953,10 @@ button { cursor: pointer; border: none; background: none; }
   flex-shrink: 0;
   display: inline-flex;
   align-items: center;
-  padding: 2px 8px;
-  border-radius: var(--radius-pill);
-  background: var(--color-redis-badge);
-  color: var(--color-redis);
+  color: var(--color-text-tertiary);
   font-family: var(--font-mono);
-  font-size: 0.9rem;
-  font-weight: 600;
+  font-size: 0.75rem;
+  font-weight: 400;
   letter-spacing: -0.02em;
 }
 

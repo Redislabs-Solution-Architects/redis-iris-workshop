@@ -85,6 +85,15 @@ langcache_service = LangCacheService(settings)
 guardrail_service = GuardrailService(settings)
 
 
+@app.on_event("startup")
+async def _startup() -> None:
+    if guardrail_service.is_configured():
+        try:
+            await guardrail_service.warm()
+        except Exception as exc:
+            log.warning("Guardrail warm-up failed (will retry on first request): %s", exc)
+
+
 @app.on_event("shutdown")
 async def _shutdown() -> None:
     await cs_service.close()
@@ -361,8 +370,25 @@ async def cs_event_stream(request: ChatRequest) -> AsyncIterator[str]:
 
     log.info("--- REQUEST [thread=%s] %s", thread_id[:8], latest_message[:80])
 
-    if guardrail_service.is_configured():
-        guard_vector = await guardrail_service.embed(latest_message.strip())
+    # --- Guardrail embed + LangCache search run in parallel ---
+    do_guard = guardrail_service.is_configured()
+    do_cache = langcache_service.is_configured()
+
+    async def _embed_guard():
+        return await guardrail_service.embed(latest_message.strip()) if do_guard else None
+
+    async def _search_cache():
+        if not do_cache:
+            return None, 0
+        t = perf_counter()
+        result = await langcache_service.search(latest_message.strip())
+        ms = max(round((perf_counter() - t) * 1000), 1)
+        return result, ms
+
+    guard_vector, cache_packed = await asyncio.gather(_embed_guard(), _search_cache())
+    cache_result, cache_ms = cache_packed
+
+    if do_guard:
         yield sse(
             "tool-call",
             toolName="guardrail_check",
@@ -404,7 +430,7 @@ async def cs_event_stream(request: ChatRequest) -> AsyncIterator[str]:
             )
             return
 
-    if langcache_service.is_configured():
+    if do_cache:
         yield sse(
             "tool-call",
             toolName="semantic_cache_search",
@@ -412,9 +438,6 @@ async def cs_event_stream(request: ChatRequest) -> AsyncIterator[str]:
             payload={"query": latest_message.strip()},
             ts=timer.elapsed_ms(),
         )
-        cache_start = perf_counter()
-        cache_result = await langcache_service.search(latest_message.strip())
-        cache_ms = max(round((perf_counter() - cache_start) * 1000), 1)
 
         if cache_result:
             yield sse(
@@ -465,24 +488,12 @@ async def cs_event_stream(request: ChatRequest) -> AsyncIterator[str]:
     final_text = ""
     thread_token = set_thread_id(thread_id)
 
-    if memory_service.is_configured() and latest_message.strip():
-        try:
-            await memory_service.add_session_event(
-                owner_id=current_user_id,
-                session_id=thread_id,
-                actor_id=current_user_id,
-                role="USER",
-                text=latest_message.strip(),
-                metadata={"source": "workshop"},
-            )
-            yield sse("status", text="Session memory updated.", ts=timer.elapsed_ms())
-        except Exception as exc:
-            log.warning("Session memory write failed: %s", exc)
-            yield sse("status", text=f"Memory logging unavailable: {exc}", ts=timer.elapsed_ms())
-    phases.append(("memory_write", timer.phase("Session memory write")))
-
+    # --- Memory: write + short-term GET + long-term SEARCH run in parallel ---
     short_term_events: list[dict[str, Any]] = []
     long_term_memories: list[dict[str, Any]] = []
+    st_error: str | None = None
+    lt_error: str | None = None
+
     if memory_service.is_configured():
         yield sse(
             "tool-call",
@@ -491,31 +502,6 @@ async def cs_event_stream(request: ChatRequest) -> AsyncIterator[str]:
             payload={"thread_id": thread_id, "owner_id": current_user_id},
             ts=timer.elapsed_ms(),
         )
-        st_start = perf_counter()
-        try:
-            session_payload = await memory_service.get_session(owner_id=current_user_id, session_id=thread_id)
-            short_term_events = session_payload.get("events", []) if isinstance(session_payload, dict) else []
-            st_ms = max(round((perf_counter() - st_start) * 1000), 1)
-            yield sse(
-                "tool-result",
-                toolName="short_term_memory_get",
-                toolKind="memory",
-                payload={"event_count": len(short_term_events), "events": short_term_events[-6:]},
-                durationMs=st_ms,
-                ts=timer.elapsed_ms(),
-            )
-        except Exception as exc:
-            st_ms = max(round((perf_counter() - st_start) * 1000), 1)
-            log.warning("  short-term GET failed (%dms): %s", st_ms, exc)
-            yield sse(
-                "tool-result",
-                toolName="short_term_memory_get",
-                toolKind="memory",
-                payload={"error": str(exc)},
-                durationMs=st_ms,
-                ts=timer.elapsed_ms(),
-            )
-
         yield sse(
             "tool-call",
             toolName="long_term_memory_search",
@@ -523,33 +509,72 @@ async def cs_event_stream(request: ChatRequest) -> AsyncIterator[str]:
             payload={"query": latest_message.strip(), "owner_id": current_user_id},
             ts=timer.elapsed_ms(),
         )
-        lt_start = perf_counter()
-        try:
-            long_term_memories = await memory_service.asearch_long_term_memory(
+
+        async def _mem_write():
+            if latest_message.strip():
+                await memory_service.add_session_event(
+                    owner_id=current_user_id,
+                    session_id=thread_id,
+                    actor_id=current_user_id,
+                    role="USER",
+                    text=latest_message.strip(),
+                    metadata={"source": "workshop"},
+                )
+
+        async def _mem_st():
+            t = perf_counter()
+            payload = await memory_service.get_session(owner_id=current_user_id, session_id=thread_id)
+            ms = max(round((perf_counter() - t) * 1000), 1)
+            events = payload.get("events", []) if isinstance(payload, dict) else []
+            return events, ms
+
+        async def _mem_lt():
+            t = perf_counter()
+            result = await memory_service.asearch_long_term_memory(
                 text=latest_message.strip(),
                 owner_id=current_user_id,
                 limit=5,
             )
-            lt_ms = max(round((perf_counter() - lt_start) * 1000), 1)
-            yield sse(
-                "tool-result",
-                toolName="long_term_memory_search",
-                toolKind="memory",
-                payload={"memory_count": len(long_term_memories), "memories": long_term_memories},
-                durationMs=lt_ms,
-                ts=timer.elapsed_ms(),
-            )
-        except Exception as exc:
-            lt_ms = max(round((perf_counter() - lt_start) * 1000), 1)
-            log.warning("  long-term SEARCH failed (%dms): %s", lt_ms, exc)
-            yield sse(
-                "tool-result",
-                toolName="long_term_memory_search",
-                toolKind="memory",
-                payload={"error": str(exc)},
-                durationMs=lt_ms,
-                ts=timer.elapsed_ms(),
-            )
+            ms = max(round((perf_counter() - t) * 1000), 1)
+            return result, ms
+
+        write_result, st_result, lt_result = await asyncio.gather(
+            _mem_write(), _mem_st(), _mem_lt(), return_exceptions=True,
+        )
+
+        if isinstance(write_result, Exception):
+            log.warning("Session memory write failed: %s", write_result)
+
+        if isinstance(st_result, Exception):
+            st_error = str(st_result)
+            st_ms = 1
+            log.warning("  short-term GET failed: %s", st_result)
+        else:
+            short_term_events, st_ms = st_result
+
+        if isinstance(lt_result, Exception):
+            lt_error = str(lt_result)
+            lt_ms = 1
+            log.warning("  long-term SEARCH failed: %s", lt_result)
+        else:
+            long_term_memories, lt_ms = lt_result
+
+        if st_error:
+            yield sse("tool-result", toolName="short_term_memory_get", toolKind="memory",
+                       payload={"error": st_error}, durationMs=st_ms, ts=timer.elapsed_ms())
+        else:
+            yield sse("tool-result", toolName="short_term_memory_get", toolKind="memory",
+                       payload={"event_count": len(short_term_events), "events": short_term_events[-6:]},
+                       durationMs=st_ms, ts=timer.elapsed_ms())
+
+        if lt_error:
+            yield sse("tool-result", toolName="long_term_memory_search", toolKind="memory",
+                       payload={"error": lt_error}, durationMs=lt_ms, ts=timer.elapsed_ms())
+        else:
+            yield sse("tool-result", toolName="long_term_memory_search", toolKind="memory",
+                       payload={"memory_count": len(long_term_memories), "memories": long_term_memories},
+                       durationMs=lt_ms, ts=timer.elapsed_ms())
+
     phases.append(("memory_enrich", timer.phase("Memory enrichment")))
 
     memory_context_sections: list[str] = []

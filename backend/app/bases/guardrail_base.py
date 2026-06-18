@@ -96,6 +96,10 @@ class GuardrailBase:
     # Public API
     # ------------------------------------------------------------------
 
+    async def warm(self) -> None:
+        """Pre-build the semantic router so the first request doesn't pay the cost."""
+        await self._ensure_router()
+
     async def embed(self, text: str) -> list[float]:
         """Generate an embedding vector for the given text."""
         resp = await self._openai.embeddings.create(
