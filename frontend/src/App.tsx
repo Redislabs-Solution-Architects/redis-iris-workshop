@@ -49,17 +49,53 @@ export default function App() {
   const hasMessages = messages.length > 0;
 
   useEffect(() => {
-    void fetch(apiUrl("/api/status"))
-      .then((r) => r.json())
-      .then((p: StatusState) => setStatus(p))
-      .catch(() => setStatus(null));
+    let cancelled = false;
+    let retryTimer: number | undefined;
+
+    async function loadStatus() {
+      try {
+        const response = await fetch(apiUrl("/api/status"), { cache: "no-store" });
+        if (!response.ok) throw new Error(`status ${response.status}`);
+        const payload: StatusState = await response.json();
+        if (!cancelled) setStatus(payload);
+      } catch {
+        if (!cancelled) {
+          setStatus(null);
+          retryTimer = window.setTimeout(loadStatus, 1000);
+        }
+      }
+    }
+
+    void loadStatus();
+    return () => {
+      cancelled = true;
+      if (retryTimer) window.clearTimeout(retryTimer);
+    };
   }, []);
 
   useEffect(() => {
-    void fetch(apiUrl("/api/domain-config"))
-      .then((r) => r.json())
-      .then((p: DomainConfig) => setDomain(p))
-      .catch(() => setDomain(null));
+    let cancelled = false;
+    let retryTimer: number | undefined;
+
+    async function loadDomain() {
+      try {
+        const response = await fetch(apiUrl("/api/domain-config"), { cache: "no-store" });
+        if (!response.ok) throw new Error(`domain-config ${response.status}`);
+        const payload: DomainConfig = await response.json();
+        if (!cancelled) setDomain(payload);
+      } catch {
+        if (!cancelled) {
+          setDomain(null);
+          retryTimer = window.setTimeout(loadDomain, 1000);
+        }
+      }
+    }
+
+    void loadDomain();
+    return () => {
+      cancelled = true;
+      if (retryTimer) window.clearTimeout(retryTimer);
+    };
   }, []);
 
   useEffect(() => {
@@ -321,6 +357,25 @@ export default function App() {
     setThreadId(crypto.randomUUID());
     setActivityPanelOpen(false);
     autoOpenedRef.current = false;
+  }
+
+  if (!domain) {
+    return (
+      <div className="shell shell--loading">
+        <header className="topbar">
+          <div className="topbar-brand">
+            <img src="/RedisLogo.png" alt="" className="topbar-brand-logo" />
+            <div className="brand-text">
+              <span className="brand-name">Redis Iris Workshop</span>
+              <span className="brand-subtitle">Starting</span>
+            </div>
+          </div>
+        </header>
+        <main className="main app-loading" aria-busy="true">
+          <span>Loading domain...</span>
+        </main>
+      </div>
+    );
   }
 
   return (
