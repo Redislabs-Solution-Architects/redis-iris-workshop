@@ -13,10 +13,15 @@ export default defineConfig(({ mode }) => {
           target,
           changeOrigin: true,
           configure: (proxy) => {
-            proxy.on("error", (err) => {
-              if ((err as NodeJS.ErrnoException).code !== "ECONNREFUSED") {
-                console.error(err);
-              }
+            // setImmediate runs after Vite adds its own error listener, so we
+            // can replace it with one that suppresses ECONNREFUSED on startup.
+            setImmediate(() => {
+              proxy.removeAllListeners("error");
+              proxy.on("error", (err) => {
+                if ((err as NodeJS.ErrnoException).code !== "ECONNREFUSED") {
+                  console.error("[vite] http proxy error\n", err);
+                }
+              });
             });
           },
         },
