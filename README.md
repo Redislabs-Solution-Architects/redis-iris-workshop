@@ -64,13 +64,14 @@ scripts/                        ← Data seeding
 |---------|-------------|
 | `make install` | Install all dependencies |
 | `make dev` | Run backend + frontend |
-| `make seed-data` | Module 0 — Load policies into Redis |
+| `make seed-data` | Module 0 — Load policies into Redis for Simple RAG |
 | `make setup-surface` | Module 3 — Create Context Surface + agent key |
-| `make load-data` | Module 3 — Load entity data |
-| `make seed-langcache` | Module 4 — Seed a LangCache entry |
+| `make load-data` | Module 3 — Load all entities via Context Surfaces |
+| `make seed-langcache` | Module 4 — Seed one LangCache entry |
 | `make seed-memories` | Module 5 — Seed long term memories |
-| `make status` | Check which modules are active |
-| `make reset` | Flush Redis + re-seed |
+| `make status` | Check which modules are active (server must be running) |
+| `make flush-redis` | Flush all keys except memory |
+| `make reset` | Flush Redis + re-seed policies |
 
 ## Prerequisites
 
