@@ -39,6 +39,20 @@ def render_field(field: FieldSpec) -> str:
     return "\n".join(lines)
 
 
+def _clean_target(target: str) -> str:
+    """Reduce a relationship target hint to a bare class name.
+
+    Accepts forms like "Order", "list[Order]", or "Order | None" and returns
+    "Order" so the emitted ``target=`` matches the entity class name.
+    """
+    target = target.strip()
+    if target.startswith("list[") and target.endswith("]"):
+        target = target[5:-1].strip()
+    if " | None" in target:
+        target = target.replace(" | None", "").strip()
+    return target
+
+
 def render(domain_id: str) -> str:
     domain = load_domain(domain_id)
     chunks = [
@@ -63,14 +77,15 @@ def render(domain_id: str) -> str:
             chunks.append(render_field(field))
             chunks.append("")
         for rel in entity.relationships:
-            chunks.append(
-                "\n".join([
-                    f"    {rel.name}: Any = ContextRelationship(",
-                    f'        description="{rel.description}",',
-                    f'        source_field="{rel.source_field}",',
-                    "    )",
-                ])
-            )
+            rel_lines = [
+                f"    {rel.name}: Any = ContextRelationship(",
+                f'        description="{rel.description}",',
+            ]
+            if rel.target:
+                rel_lines.append(f'        target="{_clean_target(rel.target)}",')
+            rel_lines.append(f'        source_field="{rel.source_field}",')
+            rel_lines.append("    )")
+            chunks.append("\n".join(rel_lines))
             chunks.append("")
         chunks.append("")
 

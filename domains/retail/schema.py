@@ -25,8 +25,9 @@ ENTITY_SPECS: tuple[EntitySpec, ...] = (
             FieldSpec("account_created_at", "str", "ISO timestamp for account creation"),
         ),
         relationships=(
-            RelationshipSpec("orders", "Orders placed by this customer", "customer_id", "list[Order]"),
-            RelationshipSpec("support_cases", "Support cases opened by this customer", "customer_id", "list[SupportCase]"),
+            RelationshipSpec("orders", "Orders placed by this customer", "customer_id", "Order"),
+            RelationshipSpec("support_cases", "Support cases opened by this customer", "customer_id", "SupportCase"),
+            RelationshipSpec("home_store", "Preferred local store", "home_store_id", "Store"),
         ),
     ),
     EntitySpec(
@@ -114,6 +115,10 @@ ENTITY_SPECS: tuple[EntitySpec, ...] = (
             FieldSpec("shipping_address", "str | None", "Delivery address"),
             FieldSpec("summary", "str", "Short order summary", index="text"),
         ),
+        relationships=(
+            RelationshipSpec("customer", "Customer who placed the order", "customer_id", "Customer"),
+            RelationshipSpec("store", "Pickup store for the order", "store_id", "Store"),
+        ),
     ),
     EntitySpec(
         class_name="OrderItem",
@@ -128,6 +133,10 @@ ENTITY_SPECS: tuple[EntitySpec, ...] = (
             FieldSpec("quantity", "int", "Quantity ordered", index="numeric"),
             FieldSpec("unit_price", "float", "Unit selling price", index="numeric"),
             FieldSpec("fulfillment_status", "str", "Line-item fulfillment status", index="tag"),
+        ),
+        relationships=(
+            RelationshipSpec("order", "Parent order", "order_id", "Order"),
+            RelationshipSpec("product", "Product ordered on this line", "product_id", "Product"),
         ),
     ),
     EntitySpec(
@@ -147,6 +156,9 @@ ENTITY_SPECS: tuple[EntitySpec, ...] = (
             FieldSpec("current_location", "str | None", "Latest known shipment location", index="text"),
             FieldSpec("delay_reason", "str | None", "Reason for any delay", index="text"),
         ),
+        relationships=(
+            RelationshipSpec("order", "Parent order", "order_id", "Order"),
+        ),
     ),
     EntitySpec(
         class_name="ShipmentEvent",
@@ -161,6 +173,10 @@ ENTITY_SPECS: tuple[EntitySpec, ...] = (
             FieldSpec("timestamp", "str", "Event timestamp"),
             FieldSpec("location", "str | None", "Event location", index="text"),
             FieldSpec("description", "str", "Human-readable event description", index="text"),
+        ),
+        relationships=(
+            RelationshipSpec("shipment", "Parent shipment", "shipment_id", "Shipment"),
+            RelationshipSpec("order", "Associated order", "order_id", "Order"),
         ),
     ),
     EntitySpec(
@@ -177,6 +193,10 @@ ENTITY_SPECS: tuple[EntitySpec, ...] = (
             FieldSpec("opened_at", "str", "Case open timestamp"),
             FieldSpec("summary", "str", "Short support summary", index="text"),
             FieldSpec("resolution", "str | None", "Resolution summary", index="text"),
+        ),
+        relationships=(
+            RelationshipSpec("customer", "Customer who opened the case", "customer_id", "Customer"),
+            RelationshipSpec("order", "Related order", "order_id", "Order"),
         ),
     ),
     EntitySpec(
