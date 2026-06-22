@@ -21,6 +21,8 @@ A hands on workshop where you pick an industry vertical and build an AI support 
 
 ## Quick Start
 
+### macOS / Linux
+
 ```bash
 git clone https://github.com/Redislabs-Solution-Architects/redis-iris-workshop.git
 cd redis-iris-workshop
@@ -29,6 +31,19 @@ cp .env.example .env   # fill in Redis + OpenAI credentials
 make seed-data
 make dev
 ```
+
+### Windows (PowerShell)
+
+```powershell
+git clone https://github.com/Redislabs-Solution-Architects/redis-iris-workshop.git
+cd redis-iris-workshop
+.\workshop.ps1 install
+Copy-Item .env.example .env   # fill in Redis + OpenAI credentials
+.\workshop.ps1 seed-data
+.\workshop.ps1 dev
+```
+
+> **Note:** If you get a "running scripts is disabled" error, run `Set-ExecutionPolicy RemoteSigned -Scope CurrentUser` once and try again.
 
 Open [localhost:3040](http://localhost:3040) and follow the [workshop guide](https://redis-iris-workshop.vercel.app).
 
@@ -58,7 +73,9 @@ domains/<domain>/               ← Schema, prompts, branding per vertical
 scripts/                        ← Data seeding
 ```
 
-## Make Targets
+## Commands
+
+On Windows, replace `make <target>` with `.\workshop.ps1 <target>`.
 
 | Command | Description |
 |---------|-------------|
