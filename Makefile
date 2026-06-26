@@ -4,7 +4,7 @@ FRONTEND_PORT ?= 3040
 DOMAIN ?= $(or $(shell grep -s '^DEMO_DOMAIN=' .env | cut -d= -f2),digital-native)
 
 .PHONY: help install backend-install frontend-install dev backend frontend \
-	seed-data setup-surface load-data seed-langcache seed-memories \
+	seed-data setup-surface load-data setup-context seed-langcache seed-memories \
 	generate-data generate-models status reset flush-redis
 
 help:
@@ -64,6 +64,8 @@ setup-surface:
 
 load-data:
 	@uv run python scripts/load_data.py --domain $(DOMAIN)
+
+setup-context: setup-surface load-data
 
 # ── Module 4: Seed LangCache ──
 seed-langcache:

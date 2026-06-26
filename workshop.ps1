@@ -21,6 +21,14 @@ if (Test-Path .env) {
     }
 }
 
+function Confirm-Uv {
+    if (-not (Get-Command uv -ErrorAction SilentlyContinue)) {
+        Write-Host "Error: uv not found. Install it from https://docs.astral.sh/uv/getting-started/installation/"
+        Write-Host "After installing, restart your terminal so it's on your PATH."
+        exit 1
+    }
+}
+
 function Show-Help {
     Write-Host ""
     Write-Host "  Redis Iris Workshop"
@@ -48,12 +56,14 @@ switch ($Command) {
         Show-Help
     }
     "install" {
+        Confirm-Uv
         uv sync
         Push-Location frontend
         npm install
         Pop-Location
     }
     "backend" {
+        Confirm-Uv
         uv run uvicorn backend.app.main:app --reload --host $BACKEND_HOST --port $BACKEND_PORT
     }
     "frontend" {
@@ -74,15 +84,17 @@ switch ($Command) {
         Write-Host "  Press Ctrl+C to stop both servers."
         Write-Host ""
 
-        $uvPath = (Get-Command uv -ErrorAction SilentlyContinue).Source
-        if (-not $uvPath) { Write-Host "Error: uv not found. Install it from https://docs.astral.sh/uv/"; exit 1 }
-        $npmPath = (Get-Command npm -ErrorAction SilentlyContinue).Source
-        if (-not $npmPath) { Write-Host "Error: npm not found. Install Node.js from https://nodejs.org/"; exit 1 }
+        Confirm-Uv
+        $uvPath = (Get-Command uv).Source
+        $npmCmd = Get-Command npm.cmd -ErrorAction SilentlyContinue
+        if (-not $npmCmd) { $npmCmd = Get-Command npm -ErrorAction SilentlyContinue }
+        if (-not $npmCmd) { Write-Host "Error: npm not found. Install Node.js from https://nodejs.org/"; exit 1 }
+        $npmPath = $npmCmd.Source
 
         $backendProc = Start-Process -NoNewWindow -PassThru -FilePath $uvPath `
             -ArgumentList "run", "uvicorn", "backend.app.main:app", "--reload", "--host", $BACKEND_HOST, "--port", $BACKEND_PORT
-        $frontendProc = Start-Process -NoNewWindow -PassThru -FilePath $npmPath `
-            -ArgumentList "run", "dev", "--", "--host", "0.0.0.0", "--port", $FRONTEND_PORT `
+        $frontendProc = Start-Process -NoNewWindow -PassThru -FilePath "cmd.exe" `
+            -ArgumentList "/c", "`"$npmPath`"", "run", "dev", "--", "--host", "0.0.0.0", "--port", $FRONTEND_PORT `
             -WorkingDirectory (Join-Path $PWD "frontend")
 
         try {
@@ -96,18 +108,29 @@ switch ($Command) {
         }
     }
     "seed-data" {
+        Confirm-Uv
         uv run python scripts/seed_data.py --domain $DOMAIN
     }
     "setup-surface" {
+        Confirm-Uv
         uv run python scripts/setup_surface.py --domain $DOMAIN
     }
     "load-data" {
+        Confirm-Uv
+        uv run python scripts/load_data.py --domain $DOMAIN
+    }
+    "setup-context" {
+        Confirm-Uv
+        uv run python scripts/setup_surface.py --domain $DOMAIN
+        if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
         uv run python scripts/load_data.py --domain $DOMAIN
     }
     "seed-langcache" {
+        Confirm-Uv
         uv run python -m scripts.seed_langcache --domain $DOMAIN
     }
     "seed-memories" {
+        Confirm-Uv
         uv run python -m scripts.seed_memories --domain $DOMAIN
     }
     "status" {
@@ -120,9 +143,11 @@ switch ($Command) {
         }
     }
     "flush-redis" {
+        Confirm-Uv
         uv run python scripts/flush_redis.py
     }
     "reset" {
+        Confirm-Uv
         uv run python scripts/flush_redis.py
         Write-Host "Re-seeding policy data..."
         uv run python scripts/seed_data.py --domain $DOMAIN
@@ -130,9 +155,11 @@ switch ($Command) {
         Write-Host "Reset complete. Run '.\workshop.ps1 dev' to start."
     }
     "generate-models" {
+        Confirm-Uv
         uv run python scripts/generate_models.py --domain $DOMAIN
     }
     "generate-data" {
+        Confirm-Uv
         uv run python scripts/generate_data.py --domain $DOMAIN
     }
     default {
