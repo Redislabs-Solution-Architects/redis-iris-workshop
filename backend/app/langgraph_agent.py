@@ -224,12 +224,14 @@ JSON_TYPE_MAP: dict[str, type] = {
 }
 
 
-def _json_schema_to_python_type(prop_def: dict[str, Any]) -> type[Any]:
+def _json_schema_to_python_type(model_name: str, prop_def: dict[str, Any]) -> type[Any]:
     json_type = prop_def.get("type", "string")
     if json_type == "array":
         item_def = prop_def.get("items", {}) if isinstance(prop_def.get("items"), dict) else {}
-        item_type = JSON_TYPE_MAP.get(item_def.get("type", "string"), str)
-        return list[item_type]  # type: ignore[index]
+        item_type = _json_schema_to_python_type(f"{model_name}_Item", item_def)
+        return list[item_type]  # type: ignore[valid-type]
+    if json_type == "object":
+        return _pydantic_model_from_json_schema(model_name, prop_def)
     return JSON_TYPE_MAP.get(json_type, str)
 
 
@@ -238,7 +240,7 @@ def _pydantic_model_from_json_schema(name: str, schema: dict) -> type[BaseModel]
     required = set(schema.get("required", []))
     fields: dict[str, Any] = {}
     for prop_name, prop_def in props.items():
-        py_type = _json_schema_to_python_type(prop_def)
+        py_type = _json_schema_to_python_type(f"{name}_{prop_name}", prop_def)
         desc = prop_def.get("description", "")
         if prop_name in required:
             fields[prop_name] = (py_type, Field(description=desc))
@@ -246,6 +248,17 @@ def _pydantic_model_from_json_schema(name: str, schema: dict) -> type[BaseModel]
             default = prop_def.get("default")
             fields[prop_name] = (Optional[py_type], Field(default=default, description=desc))
     return create_model(f"Schema_{name}", **fields)
+
+
+def _to_jsonable(value: Any) -> Any:
+    """Recursively unwrap Pydantic models (from nested object/array schema fields)."""
+    if isinstance(value, BaseModel):
+        return _to_jsonable(value.model_dump())
+    if isinstance(value, list):
+        return [_to_jsonable(v) for v in value]
+    if isinstance(value, dict):
+        return {k: _to_jsonable(v) for k, v in value.items() if v is not None}
+    return value
 
 
 def _make_mcp_tool(
@@ -258,7 +271,7 @@ def _make_mcp_tool(
     args_model = _pydantic_model_from_json_schema(name, input_schema)
 
     async def fn(**kwargs: Any) -> str:
-        clean_args = {k: v for k, v in kwargs.items() if v is not None}
+        clean_args = {k: _to_jsonable(v) for k, v in kwargs.items() if v is not None}
         for k, v in clean_args.items():
             if isinstance(v, str) and (m := _REDIS_KEY_PREFIX_RE.search(v)):
                 clean_args[k] = m.group(1)
