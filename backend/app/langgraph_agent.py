@@ -14,13 +14,12 @@ import json
 import logging
 import re
 import warnings
-from typing import Any, Callable, Optional
+from typing import Any, Callable
 
 from langchain_core.tools import StructuredTool
 from langchain_openai import ChatOpenAI
 from langgraph.checkpoint.redis.aio import AsyncRedisSaver
 from langgraph.prebuilt import create_react_agent
-from pydantic import BaseModel, Field, create_model
 
 from backend.app.services.context_service import ContextSurfaceService
 from backend.app.core.domain_loader import get_active_domain
@@ -205,47 +204,33 @@ def _make_internal_tools(service: InternalToolService) -> list[StructuredTool]:
 
     for defn in service.definitions:
         schema = defn.input_schema or {"type": "object", "properties": {}}
-        args_model = _pydantic_model_from_json_schema(defn.name, schema)
         tools.append(StructuredTool(
             name=defn.name,
             description=defn.description,
             func=_make_fn(defn.name),
             coroutine=_make_coro(defn.name),
-            args_schema=args_model,
+            args_schema=schema,
         ))
     return tools
 
 
-JSON_TYPE_MAP: dict[str, type] = {
-    "string": str,
-    "integer": int,
-    "number": float,
-    "boolean": bool,
-}
+def _strip_redis_key_prefixes(value: Any) -> Any:
+    """Rewrite full Redis keys to their bare id component, at any depth.
 
-
-def _json_schema_to_python_type(prop_def: dict[str, Any]) -> type[Any]:
-    json_type = prop_def.get("type", "string")
-    if json_type == "array":
-        item_def = prop_def.get("items", {}) if isinstance(prop_def.get("items"), dict) else {}
-        item_type = JSON_TYPE_MAP.get(item_def.get("type", "string"), str)
-        return list[item_type]  # type: ignore[index]
-    return JSON_TYPE_MAP.get(json_type, str)
-
-
-def _pydantic_model_from_json_schema(name: str, schema: dict) -> type[BaseModel]:
-    props = schema.get("properties", {})
-    required = set(schema.get("required", []))
-    fields: dict[str, Any] = {}
-    for prop_name, prop_def in props.items():
-        py_type = _json_schema_to_python_type(prop_def)
-        desc = prop_def.get("description", "")
-        if prop_name in required:
-            fields[prop_name] = (py_type, Field(description=desc))
-        else:
-            default = prop_def.get("default")
-            fields[prop_name] = (Optional[py_type], Field(default=default, description=desc))
-    return create_model(f"Schema_{name}", **fields)
+    Tool results echo full keys (``radish_bank_account:ACC001``) and the model
+    feeds them straight back as arguments. Tag filters expect only the id
+    component, and a prefixed value matches nothing while still returning HTTP
+    200 — a silent empty result — so this has to reach values nested inside
+    condition objects, not just top-level strings.
+    """
+    if isinstance(value, str):
+        match = _REDIS_KEY_PREFIX_RE.search(value)
+        return match.group(1) if match else value
+    if isinstance(value, dict):
+        return {k: _strip_redis_key_prefixes(v) for k, v in value.items()}
+    if isinstance(value, list):
+        return [_strip_redis_key_prefixes(v) for v in value]
+    return value
 
 
 def _make_mcp_tool(
@@ -254,14 +239,16 @@ def _make_mcp_tool(
 ) -> StructuredTool:
     name = tool_def["name"]
     description = tool_def.get("description", name)
+    # Hand the MCP schema to the model verbatim. Converting it to a pydantic
+    # model flattens nested objects (``tag_conditions`` items) to plain strings
+    # and drops their field enums, so the model cannot see the shape the server
+    # actually requires.
     input_schema = tool_def.get("inputSchema", {"type": "object", "properties": {}})
-    args_model = _pydantic_model_from_json_schema(name, input_schema)
 
     async def fn(**kwargs: Any) -> str:
-        clean_args = {k: v for k, v in kwargs.items() if v is not None}
-        for k, v in clean_args.items():
-            if isinstance(v, str) and (m := _REDIS_KEY_PREFIX_RE.search(v)):
-                clean_args[k] = m.group(1)
+        clean_args = {
+            k: _strip_redis_key_prefixes(v) for k, v in kwargs.items() if v is not None
+        }
         try:
             result = await cs_service.call_tool(name, clean_args)
             return json.dumps(result or {}, default=str)
@@ -274,7 +261,7 @@ def _make_mcp_tool(
         description=description,
         func=lambda **kw: "",
         coroutine=fn,
-        args_schema=args_model,
+        args_schema=input_schema,
     )
 
 
