@@ -20,6 +20,42 @@ from context_surfaces import UnifiedClient  # noqa: E402
 from backend.app.core.domain_loader import load_domain  # noqa: E402
 from backend.app.settings import get_settings  # noqa: E402
 
+# The Context Surfaces API sits behind nginx, which caps request bodies at 1 MB
+# and rejects anything larger with a 413 whose body is HTML. The SDK tries to
+# parse that as JSON, so the real status surfaces as a confusing
+# "JSONDecodeError: Expecting value: line 1 column 1 (char 0)". Batch under the
+# cap so it never happens. Entities differ wildly in record size — chunks carry
+# embeddings at ~31 KB each, price bars are ~0.2 KB — so batch by bytes, not count.
+MAX_IMPORT_BYTES = 750_000
+
+
+def batch_by_size(
+    rows: list[dict[str, Any]], entity: str, max_bytes: int = MAX_IMPORT_BYTES
+) -> list[list[dict[str, Any]]]:
+    """Split records into batches whose serialized request body stays under the cap."""
+    envelope = len(
+        json.dumps(
+            {
+                "entity": entity,
+                "records": [],
+                "options": {"on_conflict": "overwrite", "on_error": "fail_fast"},
+            }
+        )
+    )
+    batches: list[list[dict[str, Any]]] = []
+    current: list[dict[str, Any]] = []
+    current_bytes = 0
+    for row in rows:
+        row_bytes = len(json.dumps(row, default=str)) + 1
+        if current and current_bytes + row_bytes + envelope > max_bytes:
+            batches.append(current)
+            current, current_bytes = [], 0
+        current.append(row)
+        current_bytes += row_bytes
+    if current:
+        batches.append(current)
+    return batches
+
 
 def load_records(*, output_dir: Path, entity_by_file: dict[str, Any]) -> dict[str, list[dict[str, Any]]]:
     payloads: dict[str, list[dict[str, Any]]] = {}
@@ -73,27 +109,45 @@ async def main() -> None:
     async with UnifiedClient() as client:
         for class_name, rows in raw_records.items():
             model_cls = generated_models[class_name]
-            model_instances = [model_cls(**row) for row in rows]
+            batches = batch_by_size(rows, class_name)
+            imported = failed = 0
+            errors: list[Any] = []
             try:
-                result = await client.import_data(
-                    admin_key=admin_key,
-                    context_surface_id=surface_id,
-                    records=model_instances,
-                    on_conflict="overwrite",
-                    on_error="fail_fast",
-                )
-                print(f"  {class_name}: imported={result.imported}, failed={result.failed}")
-                if result.errors:
-                    for err in result.errors:
-                        print(f"    Error: {err}")
+                for batch_num, batch in enumerate(batches, start=1):
+                    model_instances = [model_cls(**row) for row in batch]
+                    result = await client.import_data(
+                        admin_key=admin_key,
+                        context_surface_id=surface_id,
+                        records=model_instances,
+                        on_conflict="overwrite",
+                        on_error="fail_fast",
+                    )
+                    imported += result.imported
+                    failed += result.failed
+                    errors.extend(result.errors or [])
+                    if len(batches) > 1:
+                        print(
+                            f"  {class_name}: batch {batch_num}/{len(batches)} "
+                            f"({len(batch)} records) imported={result.imported}"
+                        )
+                print(f"  {class_name}: imported={imported}, failed={failed}")
+                for err in errors:
+                    print(f"    Error: {err}")
             except Exception as exc:
                 failed_entities.append(class_name)
                 print(f"  {class_name}: SKIPPED ({type(exc).__name__}: {exc})")
+                if isinstance(exc, json.JSONDecodeError):
+                    print(
+                        "    (A JSONDecodeError here usually means the API returned a "
+                        "non-JSON error page — most often a 413 for an oversized batch.)"
+                    )
+                if imported:
+                    print(f"    Partially imported before failing: {imported} records")
 
     if failed_entities:
         print(f"\n  Warning: {len(failed_entities)} entity type(s) failed to import: {', '.join(failed_entities)}")
         print("  The agent will still work but may not have data for those entities.")
-        print("  This is usually caused by a temporary API issue — try `make load-data` again.")
+        print("  Re-run `make load-data`; if the same entities fail again it is not transient.")
 
     summary = domain.write_dataset_meta(settings=settings, records=raw_records)
     print(f"  Wrote dataset summary → {domain.manifest.namespace.dataset_meta_key}")
